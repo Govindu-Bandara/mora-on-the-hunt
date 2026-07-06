@@ -1,0 +1,77 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: "Holmeria";
+  src: url("/fonts/Holmeria.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@theme {
+  --color-mora-black: #060607;
+  --color-mora-black-soft: #0d0e11;
+  --color-mora-navy: #0a1c3d;
+  --color-mora-navy-light: #15346b;
+  --color-mora-gold: #e0b93c;
+  --color-mora-gold-dim: #8a712a;
+  --color-mora-white: #ffffff;
+
+  --font-slogan: "Holmeria", "Archivo Black", "Arial Black", sans-serif;
+  --font-sans: "Inter", system-ui, "Segoe UI", Roboto, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-mora-black);
+  color: var(--color-mora-white);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: clip;
+}
+
+h1, h2, h3 {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+/* Subtle grain texture for premium depth on flat dark panels */
+.mora-grain {
+  position: relative;
+  isolation: isolate;
+}
+.mora-grain::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  background-image:
+    radial-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+  background-size: 3px 3px;
+}
+
+.mora-diagonal-bottom {
+  clip-path: polygon(0 0, 100% 0, 100% 88%, 0 100%);
+}
+
+.mora-diagonal-top {
+  clip-path: polygon(0 12%, 100% 0, 100% 100%, 0 100%);
+}
+
+.text-outline-gold {
+  -webkit-text-stroke: 1.5px var(--color-mora-gold-dim);
+  color: transparent;
+}

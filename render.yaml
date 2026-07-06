@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: mora-on-the-hunt-backend
+    env: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_EXPIRES_IN
+        value: 1d
+      - key: JWT_REMEMBER_ME_EXPIRES_IN
+        value: 30d
+      - key: CLIENT_URL
+        sync: false
+      - key: MAX_UPLOAD_SIZE_MB
+        value: "5"
+      - key: SEED_ADMIN_NAME
+        sync: false
+      - key: SEED_ADMIN_EMAIL
+        sync: false
+      - key: SEED_ADMIN_PASSWORD
+        sync: false

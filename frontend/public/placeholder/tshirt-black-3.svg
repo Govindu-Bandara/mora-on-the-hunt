@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1000" viewBox="0 0 800 1000">
+  <rect width="800" height="1000" fill="#111111"/>
+  <rect x="40" y="40" width="720" height="920" fill="none" stroke="#d4af37" stroke-width="3" stroke-opacity="0.35"/>
+  <text x="400" y="470" font-family="Arial, sans-serif" font-size="42" font-weight="700" fill="#d4af37" text-anchor="middle">#MORA on the Hunt</text>
+  <text x="400" y="530" font-family="Arial, sans-serif" font-size="30" fill="#d4af37" text-anchor="middle" opacity="0.85">black T-Shirt</text>
+  <text x="400" y="580" font-family="Arial, sans-serif" font-size="22" fill="#d4af37" text-anchor="middle" opacity="0.6">Image 3</text>
+</svg>
