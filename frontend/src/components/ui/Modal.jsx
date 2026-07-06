@@ -64,6 +64,7 @@ export function Modal({ isOpen, onClose, children, className = '', labelledBy })
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 24, scale: 0.98 }}
             transition={{ duration: 0.2 }}
+            onClick={(e) => e.stopPropagation()}
             className={`w-full max-h-[90vh] overflow-y-auto rounded-2xl bg-mora-navy shadow-2xl ${className}`}
           >
             {children}
