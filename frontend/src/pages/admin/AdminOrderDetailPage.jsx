@@ -14,6 +14,7 @@ import {
 import { fetchProducts } from '../../api/productsApi';
 import { Button } from '../../components/ui/Button';
 import { Spinner } from '../../components/ui/Spinner';
+import { Modal } from '../../components/ui/Modal';
 import { SizeSelectorModal } from '../../components/order/SizeSelectorModal';
 import { useAuth } from '../../hooks/useAuth';
 
@@ -62,6 +63,7 @@ export function AdminOrderDetailPage() {
   const [editState, setEditState] = useState(null);
   const [sizeModalProduct, setSizeModalProduct] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
   useEffect(() => {
     let objectUrl;
@@ -381,7 +383,13 @@ export function AdminOrderDetailPage() {
               View PDF
             </a>
           ) : (
-            <img src={slipUrl} alt="Payment slip" className="max-h-96 rounded-lg" />
+            <button
+              type="button"
+              onClick={() => setLightboxOpen(true)}
+              className="block cursor-zoom-in transition-opacity hover:opacity-90"
+            >
+              <img src={slipUrl} alt="Payment slip" className="max-h-96 rounded-lg" />
+            </button>
           )
         ) : (
           <p className="text-mora-white/50">Loading slip...</p>
@@ -434,6 +442,30 @@ export function AdminOrderDetailPage() {
           }}
           productName={sizeModalProduct.name}
         />
+      )}
+
+      {slipUrl && order.paymentSlip.mimetype !== 'application/pdf' && (
+        <Modal
+          isOpen={lightboxOpen}
+          onClose={() => setLightboxOpen(false)}
+          className="max-w-4xl !bg-transparent !shadow-none"
+          labelledBy="payment-slip-lightbox-title"
+        >
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setLightboxOpen(false)}
+              aria-label="Close"
+              className="absolute -top-10 right-0 text-2xl leading-none text-mora-white/70 hover:text-mora-white"
+            >
+              &times;
+            </button>
+            <span id="payment-slip-lightbox-title" className="sr-only">
+              Payment slip, full size
+            </span>
+            <img src={slipUrl} alt="Payment slip (full size)" className="max-h-[85vh] w-full rounded-lg object-contain" />
+          </div>
+        </Modal>
       )}
     </div>
   );
