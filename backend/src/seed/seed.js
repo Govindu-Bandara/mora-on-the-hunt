@@ -37,7 +37,7 @@ async function seedProducts() {
     name: `${color} T-Shirt`,
     category: 'tshirt',
     color,
-    description: '#MORA on the Hunt campaign T-shirt. Represent MORA Baseball at the Inter University Games.',
+    description: '#MORA on the Hunt campaign T-shirt. Represent University of Moratuwa at the Inter University Games.',
     images: [
       `/placeholder/tshirt-${color.toLowerCase().replace(/\s+/g, '-')}-1.svg`,
       `/placeholder/tshirt-${color.toLowerCase().replace(/\s+/g, '-')}-2.svg`,
