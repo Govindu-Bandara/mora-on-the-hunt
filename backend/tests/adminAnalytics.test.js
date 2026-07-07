@@ -79,7 +79,7 @@ describe('GET /api/admin/analytics distribution stats', () => {
       subtotal: 1700,
       discount: 0,
       finalTotal: 1700,
-      paymentSlip: { filename: 'a', originalName: 'a', mimetype: 'image/jpeg', path: 'a', size: 1 },
+      paymentSlip: { key: 'payment-slips/legacy.jpg', originalName: 'a', mimetype: 'image/jpeg', size: 1 },
       status: 'Pending Verification',
       notes: [],
       createdAt: new Date(),

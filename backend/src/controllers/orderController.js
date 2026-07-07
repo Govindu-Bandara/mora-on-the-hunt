@@ -1,10 +1,10 @@
-const fs = require('fs');
 const Order = require('../models/Order');
 const Product = require('../models/Product');
 const ApiError = require('../utils/ApiError');
 const asyncHandler = require('../utils/asyncHandler');
 const generateOrderId = require('../utils/generateOrderId');
 const { calculateTotal } = require('../utils/pricingEngine');
+const storageService = require('../services/storageService');
 
 const createOrder = asyncHandler(async (req, res) => {
   const { fullName, indexOrNic, telephone, batch, faculty, department } = req.body;
@@ -46,6 +46,7 @@ const createOrder = asyncHandler(async (req, res) => {
 
   const pricing = calculateTotal(shirtCount, bangleCount);
   const orderId = await generateOrderId();
+  const key = await storageService.uploadFile(req.file.buffer, req.file.originalname, req.file.mimetype);
 
   const order = await Order.create({
     orderId,
@@ -62,10 +63,9 @@ const createOrder = asyncHandler(async (req, res) => {
     discount: pricing.bundleSavings,
     finalTotal: pricing.finalTotal,
     paymentSlip: {
-      filename: req.file.filename,
+      key,
       originalName: req.file.originalname,
       mimetype: req.file.mimetype,
-      path: req.file.path,
       size: req.file.size,
     },
   });
@@ -148,8 +148,8 @@ const addNote = asyncHandler(async (req, res) => {
 const deleteOrder = asyncHandler(async (req, res) => {
   const order = await Order.findOneAndDelete({ orderId: req.params.orderId });
   if (!order) throw new ApiError(404, 'Order not found');
-  if (order.paymentSlip?.path && fs.existsSync(order.paymentSlip.path)) {
-    fs.unlink(order.paymentSlip.path, () => {});
+  if (order.paymentSlip?.key) {
+    await storageService.deleteFile(order.paymentSlip.key).catch(() => {});
   }
   res.status(204).send();
 });
@@ -157,11 +157,16 @@ const deleteOrder = asyncHandler(async (req, res) => {
 const downloadPaymentSlip = asyncHandler(async (req, res) => {
   const order = await Order.findOne({ orderId: req.params.orderId });
   if (!order) throw new ApiError(404, 'Order not found');
-  if (!fs.existsSync(order.paymentSlip.path)) {
-    throw new ApiError(404, 'Payment slip file not found on server');
+
+  let stream;
+  try {
+    stream = await storageService.getFileStream(order.paymentSlip.key);
+  } catch {
+    throw new ApiError(404, 'Payment slip file not found in storage');
   }
+
   res.setHeader('Content-Type', order.paymentSlip.mimetype);
-  res.sendFile(order.paymentSlip.path);
+  stream.pipe(res);
 });
 
 module.exports = {

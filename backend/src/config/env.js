@@ -19,6 +19,12 @@ module.exports = {
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '1d',
   jwtRememberMeExpiresIn: process.env.JWT_REMEMBER_ME_EXPIRES_IN || '30d',
   maxUploadSizeBytes: (Number(process.env.MAX_UPLOAD_SIZE_MB) || 5) * 1024 * 1024,
+  aws: {
+    region: process.env.AWS_REGION,
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    s3Bucket: process.env.AWS_S3_BUCKET,
+  },
   seedAdmin: {
     name: process.env.SEED_ADMIN_NAME,
     email: process.env.SEED_ADMIN_EMAIL,

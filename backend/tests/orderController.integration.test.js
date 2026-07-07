@@ -5,6 +5,12 @@ const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const request = require('supertest');
 
+jest.mock('../src/services/storageService', () => ({
+  uploadFile: jest.fn().mockResolvedValue('payment-slips/fake-key.jpg'),
+  getFileStream: jest.fn(),
+  deleteFile: jest.fn().mockResolvedValue(undefined),
+}));
+
 let mongod;
 let app;
 let Product;

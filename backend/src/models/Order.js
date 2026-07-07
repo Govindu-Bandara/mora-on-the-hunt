@@ -41,10 +41,9 @@ const orderSchema = new mongoose.Schema(
     discount: { type: Number, required: true, min: 0 },
     finalTotal: { type: Number, required: true, min: 0 },
     paymentSlip: {
-      filename: { type: String, required: true },
+      key: { type: String, required: true },
       originalName: { type: String, required: true },
       mimetype: { type: String, required: true },
-      path: { type: String, required: true },
       size: { type: Number, required: true },
     },
     status: { type: String, enum: ORDER_STATUSES, default: 'Pending Verification' },
