@@ -60,12 +60,33 @@ const getAnalytics = asyncHandler(async (req, res) => {
     Order.find().sort({ createdAt: -1 }).limit(10),
   ]);
 
-  const itemTotals = await Order.aggregate([
-    { $unwind: '$items' },
-    { $group: { _id: '$items.category', qty: { $sum: '$items.quantity' } } },
+  const [itemTotals, itemDistribution, orderDistribution] = await Promise.all([
+    Order.aggregate([
+      { $unwind: '$items' },
+      { $group: { _id: '$items.category', qty: { $sum: '$items.quantity' } } },
+    ]),
+    Order.aggregate([
+      { $unwind: '$items' },
+      {
+        $group: {
+          _id: { category: '$items.category', distributed: '$distributed' },
+          qty: { $sum: '$items.quantity' },
+        },
+      },
+    ]),
+    Order.aggregate([{ $group: { _id: '$distributed', count: { $sum: 1 } } }]),
   ]);
+
   const totalShirts = itemTotals.find((i) => i._id === 'tshirt')?.qty || 0;
   const totalBangles = itemTotals.find((i) => i._id === 'bangle')?.qty || 0;
+
+  const distributedQty = (category) =>
+    itemDistribution.find((i) => i._id.category === category && i._id.distributed === true)?.qty || 0;
+  const totalShirtsDistributed = distributedQty('tshirt');
+  const totalBanglesDistributed = distributedQty('bangle');
+
+  const ordersDistributed = orderDistribution.find((o) => o._id === true)?.count || 0;
+  const ordersPendingDistribution = orderDistribution.find((o) => o._id === false || o._id == null)?.count || 0;
 
   res.json({
     totalOrders: totals[0]?.totalOrders || 0,
@@ -84,6 +105,12 @@ const getAnalytics = asyncHandler(async (req, res) => {
     facultyDistribution: facultyAgg,
     departmentDistribution: departmentAgg,
     recentOrders,
+    totalShirtsDistributed,
+    totalBanglesDistributed,
+    totalShirtsRemaining: totalShirts - totalShirtsDistributed,
+    totalBanglesRemaining: totalBangles - totalBanglesDistributed,
+    ordersDistributed,
+    ordersPendingDistribution,
   });
 });
 

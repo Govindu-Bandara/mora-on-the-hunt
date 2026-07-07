@@ -49,6 +49,8 @@ const orderSchema = new mongoose.Schema(
     },
     status: { type: String, enum: ORDER_STATUSES, default: 'Pending Verification' },
     notes: { type: [noteSchema], default: [] },
+    distributed: { type: Boolean, default: false },
+    distributedAt: { type: Date, default: null },
   },
   { timestamps: true }
 );

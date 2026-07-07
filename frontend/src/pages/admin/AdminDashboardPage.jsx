@@ -68,6 +68,24 @@ export function AdminDashboardPage() {
         <StatTile label="Most Popular Size" value={data.mostPopularSize || '—'} />
       </div>
 
+      <div>
+        <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-mora-white/50">
+          Distribution Progress
+        </p>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <StatTile
+            label="T-Shirts Distributed"
+            value={`${data.totalShirtsDistributed} / ${data.totalShirts}`}
+          />
+          <StatTile
+            label="Bangles Distributed"
+            value={`${data.totalBanglesDistributed} / ${data.totalBangles}`}
+          />
+          <StatTile label="Orders Distributed" value={data.ordersDistributed} />
+          <StatTile label="Orders Pending Distribution" value={data.ordersPendingDistribution} />
+        </div>
+      </div>
+
       <div className="grid gap-6 lg:grid-cols-2">
         <DistributionChart title="Faculty Distribution" data={data.facultyDistribution} />
         <DistributionChart title="Department Distribution" data={data.departmentDistribution} />

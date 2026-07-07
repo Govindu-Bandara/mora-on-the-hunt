@@ -22,6 +22,11 @@ export async function updateOrderStatus(orderId, status) {
   return data.order;
 }
 
+export async function updateOrderDistributed(orderId, distributed) {
+  const { data } = await axiosClient.patch(`/orders/${orderId}/distributed`, { distributed });
+  return data.order;
+}
+
 export async function addOrderNote(orderId, text) {
   const { data } = await axiosClient.patch(`/orders/${orderId}/notes`, { text });
   return data.order;

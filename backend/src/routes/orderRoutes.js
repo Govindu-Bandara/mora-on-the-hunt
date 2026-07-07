@@ -4,6 +4,7 @@ const {
   listOrders,
   getOrder,
   updateStatus,
+  updateDistributed,
   addNote,
   deleteOrder,
   downloadPaymentSlip,
@@ -26,6 +27,7 @@ router.get('/', verifyJWT, listOrders);
 router.get('/:orderId', verifyJWT, getOrder);
 router.get('/:orderId/payment-slip', verifyJWT, downloadPaymentSlip);
 router.patch('/:orderId/status', verifyJWT, updateStatus);
+router.patch('/:orderId/distributed', verifyJWT, updateDistributed);
 router.patch('/:orderId/notes', verifyJWT, addNote);
 router.delete('/:orderId', verifyJWT, requireRole('superadmin'), deleteOrder);
 

@@ -78,12 +78,16 @@ const createOrder = asyncHandler(async (req, res) => {
 });
 
 const listOrders = asyncHandler(async (req, res) => {
-  const { status, batch, faculty, search, page = 1, limit = 20, sort = '-createdAt' } = req.query;
+  const { status, batch, faculty, distributed, search, page = 1, limit = 20, sort = '-createdAt' } =
+    req.query;
 
   const filter = {};
   if (status) filter.status = status;
   if (batch) filter.batch = batch;
   if (faculty) filter.faculty = faculty;
+  if (distributed === 'true' || distributed === 'false') {
+    filter.distributed = distributed === 'true';
+  }
   if (search) filter.$text = { $search: search };
 
   const pageNum = Math.max(1, Number(page));
@@ -111,6 +115,17 @@ const updateStatus = asyncHandler(async (req, res) => {
   const order = await Order.findOneAndUpdate(
     { orderId: req.params.orderId },
     { status },
+    { new: true, runValidators: true }
+  );
+  if (!order) throw new ApiError(404, 'Order not found');
+  res.json({ order });
+});
+
+const updateDistributed = asyncHandler(async (req, res) => {
+  const { distributed } = req.body;
+  const order = await Order.findOneAndUpdate(
+    { orderId: req.params.orderId },
+    { distributed: Boolean(distributed), distributedAt: distributed ? new Date() : null },
     { new: true, runValidators: true }
   );
   if (!order) throw new ApiError(404, 'Order not found');
@@ -154,6 +169,7 @@ module.exports = {
   listOrders,
   getOrder,
   updateStatus,
+  updateDistributed,
   addNote,
   deleteOrder,
   downloadPaymentSlip,

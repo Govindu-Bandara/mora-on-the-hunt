@@ -5,6 +5,7 @@ import { useFetch } from '../../hooks/useFetch';
 import {
   fetchOrder,
   updateOrderStatus,
+  updateOrderDistributed,
   addOrderNote,
   deleteOrder,
   fetchPaymentSlipBlob,
@@ -46,6 +47,16 @@ export function AdminOrderDetailPage() {
     }
   }
 
+  async function handleToggleDistributed() {
+    try {
+      await updateOrderDistributed(orderId, !order.distributed);
+      toast.success(order.distributed ? 'Marked as not distributed' : 'Marked as distributed');
+      refetch();
+    } catch {
+      toast.error('Failed to update distribution status');
+    }
+  }
+
   async function handleAddNote() {
     if (!noteText.trim()) return;
     try {
@@ -80,19 +91,32 @@ export function AdminOrderDetailPage() {
 
   return (
     <div className="max-w-3xl space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold text-mora-white">{order.orderId}</h1>
-        <select
-          value={order.status}
-          onChange={handleStatusChange}
-          className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-mora-white"
-        >
-          {STATUSES.map((s) => (
-            <option key={s} value={s}>
-              {s}
-            </option>
-          ))}
-        </select>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={handleToggleDistributed}
+            className={`rounded-lg border px-4 py-2 text-sm font-semibold transition-colors ${
+              order.distributed
+                ? 'border-green-500/40 bg-green-500/10 text-green-400'
+                : 'border-white/10 bg-white/5 text-mora-white/70 hover:border-mora-gold'
+            }`}
+          >
+            {order.distributed ? '✓ Distributed' : 'Mark as Distributed'}
+          </button>
+          <select
+            value={order.status}
+            onChange={handleStatusChange}
+            className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-mora-white"
+          >
+            {STATUSES.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <div className="rounded-xl border border-white/10 bg-white/5 p-5">
