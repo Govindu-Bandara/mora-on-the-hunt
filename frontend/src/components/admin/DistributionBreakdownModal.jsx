@@ -1,22 +1,24 @@
+import { useState } from 'react';
 import { Modal } from '../ui/Modal';
 import { Spinner } from '../ui/Spinner';
 import { useFetch } from '../../hooks/useFetch';
 import { fetchDistributionBreakdown } from '../../api/authApi';
 
-function Cell({ stats }) {
-  if (!stats || stats.total === 0) {
+const TABS = [
+  { key: 'total', label: 'Total' },
+  { key: 'distributed', label: 'Distributed' },
+  { key: 'remaining', label: 'To Be Distributed' },
+];
+
+function Cell({ value }) {
+  if (!value) {
     return <td className="px-3 py-2 text-center text-mora-white/20">&mdash;</td>;
   }
-  return (
-    <td className="px-3 py-2 text-center">
-      <div className="text-sm font-bold text-mora-white">{stats.total}</div>
-      <div className="text-[10px] text-green-400">{stats.distributed} done</div>
-      <div className="text-[10px] text-mora-gold">{stats.remaining} left</div>
-    </td>
-  );
+  return <td className="px-3 py-2 text-center text-sm font-bold text-mora-white">{value}</td>;
 }
 
 export function DistributionBreakdownModal({ isOpen, onClose }) {
+  const [tab, setTab] = useState('total');
   const { data, loading } = useFetch(
     () => (isOpen ? fetchDistributionBreakdown() : Promise.resolve(null)),
     [isOpen]
@@ -44,6 +46,23 @@ export function DistributionBreakdownModal({ isOpen, onClose }) {
           </button>
         </div>
 
+        <div className="mb-4 flex gap-2">
+          {TABS.map((t) => (
+            <button
+              key={t.key}
+              type="button"
+              onClick={() => setTab(t.key)}
+              className={`rounded-lg border px-4 py-2 text-sm font-semibold transition-colors ${
+                tab === t.key
+                  ? 'border-mora-gold bg-mora-gold/10 text-mora-gold'
+                  : 'border-white/10 bg-white/5 text-mora-white/60 hover:text-mora-white'
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+
         {loading || !data ? (
           <div className="flex justify-center py-16">
             <Spinner />
@@ -67,9 +86,12 @@ export function DistributionBreakdownModal({ isOpen, onClose }) {
                   <tr key={row.name} className="border-t border-white/5 text-mora-white/80">
                     <td className="px-4 py-2 font-medium">{row.name}</td>
                     {data.sizes.map((size) => (
-                      <Cell key={size} stats={row.category === 'tshirt' ? row.bySize[size] : null} />
+                      <Cell
+                        key={size}
+                        value={row.category === 'tshirt' ? row.bySize[size]?.[tab] : null}
+                      />
                     ))}
-                    <Cell stats={row.total} />
+                    <Cell value={row.total[tab]} />
                   </tr>
                 ))}
                 {data.rows.length === 0 && (
@@ -85,8 +107,9 @@ export function DistributionBreakdownModal({ isOpen, onClose }) {
         )}
 
         <p className="mt-4 text-xs text-mora-white/40">
-          Each cell shows total ordered, how many have been marked distributed, and how many are
-          still left to hand out.
+          {tab === 'total' && 'Total quantity ordered per item and size.'}
+          {tab === 'distributed' && 'Quantity already marked as distributed per item and size.'}
+          {tab === 'remaining' && 'Quantity still left to hand out per item and size.'}
         </p>
       </div>
     </Modal>

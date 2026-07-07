@@ -8,11 +8,6 @@ import { Spinner } from '../../components/ui/Spinner';
 import { Select } from '../../components/ui/Select';
 import { DistributionBreakdownModal } from '../../components/admin/DistributionBreakdownModal';
 
-const STATUSES = ['Pending Verification', 'Verified', 'Completed', 'Cancelled'];
-const STATUS_OPTIONS = [
-  { value: '', label: 'All Statuses' },
-  ...STATUSES.map((s) => ({ value: s, label: s })),
-];
 const DISTRIBUTED_OPTIONS = [
   { value: '', label: 'All (Distributed & Pending)' },
   { value: 'false', label: 'Not Distributed' },
@@ -50,7 +45,6 @@ function DistributionSummary({ analytics }) {
 export function AdminOrdersPage() {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
-  const [status, setStatus] = useState('');
   const [distributed, setDistributed] = useState('');
   const [page, setPage] = useState(1);
   const [breakdownOpen, setBreakdownOpen] = useState(false);
@@ -59,12 +53,11 @@ export function AdminOrdersPage() {
     () =>
       fetchOrders({
         search: search || undefined,
-        status: status || undefined,
         distributed: distributed || undefined,
         page,
         limit: 20,
       }),
-    [search, status, distributed, page]
+    [search, distributed, page]
   );
   const { data: analytics, refetch: refetchAnalytics } = useFetch(fetchAnalytics, []);
 
@@ -104,15 +97,6 @@ export function AdminOrdersPage() {
           }}
           placeholder="Search by name, telephone, NIC..."
           className="flex-1 min-w-[200px] rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-mora-white focus:border-mora-gold focus:outline-none"
-        />
-        <Select
-          value={status}
-          onChange={(v) => {
-            setPage(1);
-            setStatus(v);
-          }}
-          options={STATUS_OPTIONS}
-          className="w-48"
         />
         <Select
           value={distributed}
