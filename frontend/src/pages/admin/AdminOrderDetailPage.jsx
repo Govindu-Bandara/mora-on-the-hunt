@@ -456,7 +456,7 @@ export function AdminOrderDetailPage() {
               type="button"
               onClick={() => setLightboxOpen(false)}
               aria-label="Close"
-              className="absolute -top-10 right-0 text-2xl leading-none text-mora-white/70 hover:text-mora-white"
+              className="absolute right-2 top-2 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-black/70 text-2xl leading-none text-mora-white hover:bg-black/90"
             >
               &times;
             </button>
