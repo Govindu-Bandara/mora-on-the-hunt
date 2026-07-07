@@ -69,12 +69,17 @@ const getAnalytics = asyncHandler(async (req, res) => {
       { $unwind: '$items' },
       {
         $group: {
-          _id: { category: '$items.category', distributed: '$distributed' },
+          _id: {
+            category: '$items.category',
+            distributed: { $ifNull: ['$distributed', false] },
+          },
           qty: { $sum: '$items.quantity' },
         },
       },
     ]),
-    Order.aggregate([{ $group: { _id: '$distributed', count: { $sum: 1 } } }]),
+    Order.aggregate([
+      { $group: { _id: { $ifNull: ['$distributed', false] }, count: { $sum: 1 } } },
+    ]),
   ]);
 
   const totalShirts = itemTotals.find((i) => i._id === 'tshirt')?.qty || 0;
@@ -86,7 +91,7 @@ const getAnalytics = asyncHandler(async (req, res) => {
   const totalBanglesDistributed = distributedQty('bangle');
 
   const ordersDistributed = orderDistribution.find((o) => o._id === true)?.count || 0;
-  const ordersPendingDistribution = orderDistribution.find((o) => o._id === false || o._id == null)?.count || 0;
+  const ordersPendingDistribution = orderDistribution.find((o) => o._id === false)?.count || 0;
 
   res.json({
     totalOrders: totals[0]?.totalOrders || 0,
