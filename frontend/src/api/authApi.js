@@ -32,3 +32,8 @@ export async function fetchAnalytics() {
   const { data } = await axiosClient.get('/admin/analytics');
   return data;
 }
+
+export async function fetchDistributionBreakdown() {
+  const { data } = await axiosClient.get('/admin/distribution-breakdown');
+  return data;
+}

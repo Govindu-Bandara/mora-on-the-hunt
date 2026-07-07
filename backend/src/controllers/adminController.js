@@ -1,5 +1,6 @@
 const Admin = require('../models/Admin');
 const Order = require('../models/Order');
+const { SIZES } = require('../models/Order');
 const ApiError = require('../utils/ApiError');
 const asyncHandler = require('../utils/asyncHandler');
 
@@ -119,6 +120,50 @@ const getAnalytics = asyncHandler(async (req, res) => {
   });
 });
 
+const getDistributionBreakdown = asyncHandler(async (req, res) => {
+  const breakdown = await Order.aggregate([
+    { $unwind: '$items' },
+    {
+      $group: {
+        _id: {
+          name: '$items.name',
+          category: '$items.category',
+          size: '$items.size',
+          distributed: { $ifNull: ['$distributed', false] },
+        },
+        qty: { $sum: '$items.quantity' },
+      },
+    },
+  ]);
+
+  const productNames = [...new Set(breakdown.map((b) => b._id.name))].sort();
+
+  function cellFor(entries) {
+    const total = entries.reduce((sum, e) => sum + e.qty, 0);
+    const distributed = entries
+      .filter((e) => e._id.distributed === true)
+      .reduce((sum, e) => sum + e.qty, 0);
+    return { total, distributed, remaining: total - distributed };
+  }
+
+  const rows = productNames.map((name) => {
+    const entries = breakdown.filter((b) => b._id.name === name);
+    const category = entries[0]._id.category;
+
+    if (category === 'tshirt') {
+      const bySize = {};
+      SIZES.forEach((size) => {
+        bySize[size] = cellFor(entries.filter((e) => e._id.size === size));
+      });
+      return { name, category, bySize, total: cellFor(entries) };
+    }
+
+    return { name, category, bySize: {}, total: cellFor(entries) };
+  });
+
+  res.json({ sizes: SIZES, rows });
+});
+
 const listAdmins = asyncHandler(async (req, res) => {
   const admins = await Admin.find().select('-password');
   res.json({ admins });
@@ -166,4 +211,11 @@ const resetAdminPassword = asyncHandler(async (req, res) => {
   res.json({ message: 'Password reset successfully' });
 });
 
-module.exports = { getAnalytics, listAdmins, createAdmin, deleteAdmin, resetAdminPassword };
+module.exports = {
+  getAnalytics,
+  getDistributionBreakdown,
+  listAdmins,
+  createAdmin,
+  deleteAdmin,
+  resetAdminPassword,
+};

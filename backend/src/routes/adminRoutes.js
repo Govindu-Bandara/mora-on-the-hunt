@@ -1,6 +1,7 @@
 const express = require('express');
 const {
   getAnalytics,
+  getDistributionBreakdown,
   listAdmins,
   createAdmin,
   deleteAdmin,
@@ -13,6 +14,7 @@ const router = express.Router();
 router.use(verifyJWT);
 
 router.get('/analytics', getAnalytics);
+router.get('/distribution-breakdown', getDistributionBreakdown);
 
 router.get('/admins', requireRole('superadmin'), listAdmins);
 router.post('/admins', requireRole('superadmin'), createAdmin);

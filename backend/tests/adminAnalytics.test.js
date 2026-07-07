@@ -100,3 +100,26 @@ describe('GET /api/admin/analytics distribution stats', () => {
     expect(Number.isNaN(res.body.totalShirtsRemaining)).toBe(false);
   });
 });
+
+describe('GET /api/admin/distribution-breakdown', () => {
+  test('pivots items by product name and size', async () => {
+    const res = await request(app)
+      .get('/api/admin/distribution-breakdown')
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.sizes).toEqual(['XS', 'S', 'M', 'L', 'XL', 'XXL']);
+
+    const shirtRow = res.body.rows.find((r) => r.name === 'White T-Shirt');
+    expect(shirtRow).toBeDefined();
+    expect(shirtRow.category).toBe('tshirt');
+    expect(shirtRow.bySize.M).toEqual({ total: 1, distributed: 0, remaining: 1 });
+    expect(shirtRow.bySize.S).toEqual({ total: 0, distributed: 0, remaining: 0 });
+    expect(shirtRow.total).toEqual({ total: 1, distributed: 0, remaining: 1 });
+  });
+
+  test('rejects without a token', async () => {
+    const res = await request(app).get('/api/admin/distribution-breakdown');
+    expect(res.status).toBe(401);
+  });
+});

@@ -5,8 +5,19 @@ import { useFetch } from '../../hooks/useFetch';
 import { fetchOrders, updateOrderDistributed } from '../../api/ordersApi';
 import { fetchAnalytics } from '../../api/authApi';
 import { Spinner } from '../../components/ui/Spinner';
+import { Select } from '../../components/ui/Select';
+import { DistributionBreakdownModal } from '../../components/admin/DistributionBreakdownModal';
 
 const STATUSES = ['Pending Verification', 'Verified', 'Completed', 'Cancelled'];
+const STATUS_OPTIONS = [
+  { value: '', label: 'All Statuses' },
+  ...STATUSES.map((s) => ({ value: s, label: s })),
+];
+const DISTRIBUTED_OPTIONS = [
+  { value: '', label: 'All (Distributed & Pending)' },
+  { value: 'false', label: 'Not Distributed' },
+  { value: 'true', label: 'Distributed' },
+];
 
 function DistributionSummary({ analytics }) {
   if (!analytics) return null;
@@ -42,6 +53,7 @@ export function AdminOrdersPage() {
   const [status, setStatus] = useState('');
   const [distributed, setDistributed] = useState('');
   const [page, setPage] = useState(1);
+  const [breakdownOpen, setBreakdownOpen] = useState(false);
 
   const { data, loading, refetch } = useFetch(
     () =>
@@ -70,7 +82,16 @@ export function AdminOrdersPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-mora-white">Orders</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-2xl font-bold text-mora-white">Orders</h1>
+        <button
+          type="button"
+          onClick={() => setBreakdownOpen(true)}
+          className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-mora-white/70 hover:border-mora-gold hover:text-mora-white"
+        >
+          Distribution Breakdown
+        </button>
+      </div>
 
       <DistributionSummary analytics={analytics} />
 
@@ -84,33 +105,24 @@ export function AdminOrdersPage() {
           placeholder="Search by name, telephone, NIC..."
           className="flex-1 min-w-[200px] rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-mora-white focus:border-mora-gold focus:outline-none"
         />
-        <select
+        <Select
           value={status}
-          onChange={(e) => {
+          onChange={(v) => {
             setPage(1);
-            setStatus(e.target.value);
+            setStatus(v);
           }}
-          className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-mora-white focus:border-mora-gold focus:outline-none"
-        >
-          <option value="">All Statuses</option>
-          {STATUSES.map((s) => (
-            <option key={s} value={s}>
-              {s}
-            </option>
-          ))}
-        </select>
-        <select
+          options={STATUS_OPTIONS}
+          className="w-48"
+        />
+        <Select
           value={distributed}
-          onChange={(e) => {
+          onChange={(v) => {
             setPage(1);
-            setDistributed(e.target.value);
+            setDistributed(v);
           }}
-          className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-mora-white focus:border-mora-gold focus:outline-none"
-        >
-          <option value="">All (Distributed &amp; Pending)</option>
-          <option value="false">Not Distributed</option>
-          <option value="true">Distributed</option>
-        </select>
+          options={DISTRIBUTED_OPTIONS}
+          className="w-60"
+        />
       </div>
 
       {loading ? (
@@ -199,6 +211,8 @@ export function AdminOrdersPage() {
           </button>
         </div>
       )}
+
+      <DistributionBreakdownModal isOpen={breakdownOpen} onClose={() => setBreakdownOpen(false)} />
     </div>
   );
 }
