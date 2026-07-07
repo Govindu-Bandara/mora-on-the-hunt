@@ -128,3 +128,67 @@ describe('Auth-gated order routes', () => {
     expect(res.status).toBe(401);
   });
 });
+
+describe('PUT /api/orders/:orderId', () => {
+  let token;
+
+  beforeAll(async () => {
+    // eslint-disable-next-line global-require
+    const Admin = require('../src/models/Admin');
+    // eslint-disable-next-line global-require
+    const jwt = require('jsonwebtoken');
+    const hashed = await Admin.hashPassword('password123');
+    const admin = await Admin.create({
+      name: 'Edit Test Admin',
+      email: 'edit-admin@test.com',
+      password: hashed,
+      role: 'admin',
+    });
+    token = jwt.sign({ id: admin._id, role: admin.role }, process.env.JWT_SECRET);
+  });
+
+  test('recomputes totals when an admin edits order items', async () => {
+    const shirt = await Product.findOne({ category: 'tshirt' });
+    const bangle = await Product.findOne({ category: 'bangle' });
+
+    const createRes = await request(app)
+      .post('/api/orders')
+      .field('fullName', 'Edit Me')
+      .field('indexOrNic', '200055555')
+      .field('telephone', '0771234567')
+      .field('batch', '2021')
+      .field('faculty', 'Engineering')
+      .field('department', 'CSE')
+      .field('items', JSON.stringify([{ productId: shirt._id.toString(), size: 'M', quantity: 1 }]))
+      .attach('paymentSlip', testFilePath);
+
+    expect(createRes.status).toBe(201);
+    const { orderId } = createRes.body;
+
+    const updateRes = await request(app)
+      .put(`/api/orders/${orderId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        fullName: 'Edited Name',
+        indexOrNic: '200055555',
+        telephone: '0779999999',
+        batch: '2021',
+        faculty: 'Engineering',
+        department: 'CSE',
+        items: [
+          { productId: shirt._id.toString(), size: 'M', quantity: 1 },
+          { productId: bangle._id.toString(), quantity: 1 },
+        ],
+      });
+
+    expect(updateRes.status).toBe(200);
+    expect(updateRes.body.order.fullName).toBe('Edited Name');
+    expect(updateRes.body.order.finalTotal).toBe(1850); // 1 shirt + 1 bangle bundled
+    expect(updateRes.body.order.items).toHaveLength(2);
+  });
+
+  test('rejects edit without a token', async () => {
+    const res = await request(app).put('/api/orders/MORA-000001').send({});
+    expect(res.status).toBe(401);
+  });
+});

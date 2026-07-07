@@ -3,6 +3,7 @@ const {
   createOrder,
   listOrders,
   getOrder,
+  updateOrder,
   updateStatus,
   updateDistributed,
   addNote,
@@ -26,6 +27,7 @@ router.post(
 router.get('/', verifyJWT, listOrders);
 router.get('/:orderId', verifyJWT, getOrder);
 router.get('/:orderId/payment-slip', verifyJWT, downloadPaymentSlip);
+router.put('/:orderId', verifyJWT, createOrderValidator, validate, updateOrder);
 router.patch('/:orderId/status', verifyJWT, updateStatus);
 router.patch('/:orderId/distributed', verifyJWT, updateDistributed);
 router.patch('/:orderId/notes', verifyJWT, addNote);

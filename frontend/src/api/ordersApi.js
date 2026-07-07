@@ -17,6 +17,11 @@ export async function fetchOrder(orderId) {
   return data.order;
 }
 
+export async function updateOrder(orderId, payload) {
+  const { data } = await axiosClient.put(`/orders/${orderId}`, payload);
+  return data.order;
+}
+
 export async function updateOrderStatus(orderId, status) {
   const { data } = await axiosClient.patch(`/orders/${orderId}/status`, { status });
   return data.order;

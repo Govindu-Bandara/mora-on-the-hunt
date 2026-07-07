@@ -4,25 +4,64 @@ import toast from 'react-hot-toast';
 import { useFetch } from '../../hooks/useFetch';
 import {
   fetchOrder,
+  updateOrder,
   updateOrderStatus,
   updateOrderDistributed,
   addOrderNote,
   deleteOrder,
   fetchPaymentSlipBlob,
 } from '../../api/ordersApi';
+import { fetchProducts } from '../../api/productsApi';
 import { Button } from '../../components/ui/Button';
 import { Spinner } from '../../components/ui/Spinner';
+import { SizeSelectorModal } from '../../components/order/SizeSelectorModal';
 import { useAuth } from '../../hooks/useAuth';
 
 const STATUSES = ['Pending Verification', 'Verified', 'Completed', 'Cancelled'];
+const CUSTOMER_FIELDS = [
+  { name: 'fullName', label: 'Full Name' },
+  { name: 'indexOrNic', label: 'Index/NIC' },
+  { name: 'telephone', label: 'Telephone' },
+  { name: 'batch', label: 'Batch' },
+  { name: 'faculty', label: 'Faculty' },
+  { name: 'department', label: 'Department' },
+];
+
+function orderToEditState(order) {
+  return {
+    customer: {
+      fullName: order.fullName,
+      indexOrNic: order.indexOrNic,
+      telephone: order.telephone,
+      batch: order.batch,
+      faculty: order.faculty,
+      department: order.department,
+    },
+    items: order.items.map((item, i) => ({
+      key: `${item.product}-${item.size || 'none'}-${i}`,
+      productId: item.product,
+      name: item.name,
+      category: item.category,
+      color: item.color,
+      size: item.size,
+      quantity: item.quantity,
+      unitPrice: item.unitPrice,
+    })),
+  };
+}
 
 export function AdminOrderDetailPage() {
   const { orderId } = useParams();
   const navigate = useNavigate();
   const { admin } = useAuth();
   const { data: order, loading, refetch } = useFetch(() => fetchOrder(orderId), [orderId]);
+  const { data: products } = useFetch(() => fetchProducts(), []);
   const [noteText, setNoteText] = useState('');
   const [slipUrl, setSlipUrl] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editState, setEditState] = useState(null);
+  const [sizeModalProduct, setSizeModalProduct] = useState(null);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     let objectUrl;
@@ -36,6 +75,84 @@ export function AdminOrderDetailPage() {
       if (objectUrl) URL.revokeObjectURL(objectUrl);
     };
   }, [orderId]);
+
+  function startEditing() {
+    setEditState(orderToEditState(order));
+    setIsEditing(true);
+  }
+
+  function cancelEditing() {
+    setEditState(null);
+    setIsEditing(false);
+  }
+
+  function updateCustomerField(name, value) {
+    setEditState((prev) => ({ ...prev, customer: { ...prev.customer, [name]: value } }));
+  }
+
+  function updateItemQuantity(key, quantity) {
+    setEditState((prev) => ({
+      ...prev,
+      items: prev.items.map((i) => (i.key === key ? { ...i, quantity: Math.max(1, quantity) } : i)),
+    }));
+  }
+
+  function removeItem(key) {
+    setEditState((prev) => ({ ...prev, items: prev.items.filter((i) => i.key !== key) }));
+  }
+
+  function addItem(product, size) {
+    setEditState((prev) => ({
+      ...prev,
+      items: [
+        ...prev.items,
+        {
+          key: `${product._id}-${size || 'none'}-${Date.now()}`,
+          productId: product._id,
+          name: product.name,
+          category: product.category,
+          color: product.color,
+          size: size || null,
+          quantity: 1,
+          unitPrice: product.currentPrice,
+        },
+      ],
+    }));
+  }
+
+  function handleAddProductClick(product) {
+    if (product.category === 'tshirt') {
+      setSizeModalProduct(product);
+    } else {
+      addItem(product, null);
+    }
+  }
+
+  async function handleSaveEdit() {
+    if (editState.items.length === 0) {
+      toast.error('An order must have at least one item');
+      return;
+    }
+    setSaving(true);
+    try {
+      await updateOrder(orderId, {
+        ...editState.customer,
+        items: editState.items.map((i) => ({
+          productId: i.productId,
+          size: i.size,
+          quantity: i.quantity,
+        })),
+      });
+      toast.success('Order updated');
+      setIsEditing(false);
+      setEditState(null);
+      refetch();
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to update order');
+    } finally {
+      setSaving(false);
+    }
+  }
 
   async function handleStatusChange(e) {
     try {
@@ -89,11 +206,24 @@ export function AdminOrderDetailPage() {
 
   if (!order) return <p className="text-mora-white/60">Order not found.</p>;
 
+  const editTotal = isEditing
+    ? editState.items.reduce((sum, i) => sum + i.unitPrice * i.quantity, 0)
+    : null;
+
   return (
     <div className="max-w-3xl space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold text-mora-white">{order.orderId}</h1>
         <div className="flex items-center gap-3">
+          {!isEditing && (
+            <button
+              type="button"
+              onClick={startEditing}
+              className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-mora-white/70 hover:border-mora-gold hover:text-mora-white"
+            >
+              Edit Order
+            </button>
+          )}
           <button
             type="button"
             onClick={handleToggleDistributed}
@@ -123,37 +253,122 @@ export function AdminOrderDetailPage() {
         <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-mora-white/60">
           Customer
         </h2>
-        <dl className="grid grid-cols-2 gap-3 text-sm text-mora-white/80">
-          <div><dt className="text-mora-white/50">Full Name</dt><dd>{order.fullName}</dd></div>
-          <div><dt className="text-mora-white/50">Index/NIC</dt><dd>{order.indexOrNic}</dd></div>
-          <div><dt className="text-mora-white/50">Telephone</dt><dd>{order.telephone}</dd></div>
-          <div><dt className="text-mora-white/50">Batch</dt><dd>{order.batch}</dd></div>
-          <div><dt className="text-mora-white/50">Faculty</dt><dd>{order.faculty}</dd></div>
-          <div><dt className="text-mora-white/50">Department</dt><dd>{order.department}</dd></div>
-        </dl>
+        {isEditing ? (
+          <div className="grid grid-cols-2 gap-3">
+            {CUSTOMER_FIELDS.map((field) => (
+              <div key={field.name}>
+                <label className="mb-1 block text-xs text-mora-white/50">{field.label}</label>
+                <input
+                  value={editState.customer[field.name]}
+                  onChange={(e) => updateCustomerField(field.name, e.target.value)}
+                  className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-mora-white focus:border-mora-gold focus:outline-none"
+                />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <dl className="grid grid-cols-2 gap-3 text-sm text-mora-white/80">
+            <div><dt className="text-mora-white/50">Full Name</dt><dd>{order.fullName}</dd></div>
+            <div><dt className="text-mora-white/50">Index/NIC</dt><dd>{order.indexOrNic}</dd></div>
+            <div><dt className="text-mora-white/50">Telephone</dt><dd>{order.telephone}</dd></div>
+            <div><dt className="text-mora-white/50">Batch</dt><dd>{order.batch}</dd></div>
+            <div><dt className="text-mora-white/50">Faculty</dt><dd>{order.faculty}</dd></div>
+            <div><dt className="text-mora-white/50">Department</dt><dd>{order.department}</dd></div>
+          </dl>
+        )}
       </div>
 
       <div className="rounded-xl border border-white/10 bg-white/5 p-5">
         <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-mora-white/60">
           Items
         </h2>
-        <ul className="space-y-2 text-sm text-mora-white/80">
-          {order.items.map((item, i) => (
-            <li key={i} className="flex justify-between">
-              <span>
-                {item.name}
-                {item.size ? ` (${item.size})` : ''} &times; {item.quantity}
-              </span>
-              <span>Rs. {item.unitPrice * item.quantity}</span>
-            </li>
-          ))}
-        </ul>
-        <div className="mt-3 border-t border-white/10 pt-3 text-sm text-mora-white/70">
-          <div className="flex justify-between"><span>Bundle Savings</span><span>Rs. {order.bundleSavings}</span></div>
-          <div className="mt-1 flex justify-between text-base font-bold text-mora-gold">
-            <span>Final Total</span><span>Rs. {order.finalTotal}</span>
+
+        {isEditing ? (
+          <div className="space-y-2">
+            {editState.items.map((item) => (
+              <div key={item.key} className="flex items-center justify-between gap-3 rounded-lg border border-white/10 bg-black/20 px-3 py-2">
+                <span className="text-sm text-mora-white/80">
+                  {item.name}
+                  {item.size ? ` (${item.size})` : ''}
+                </span>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="number"
+                    min={1}
+                    value={item.quantity}
+                    onChange={(e) => updateItemQuantity(item.key, Number(e.target.value))}
+                    className="w-16 rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-sm text-mora-white"
+                  />
+                  <span className="w-20 text-right text-sm text-mora-gold">
+                    Rs. {item.unitPrice * item.quantity}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => removeItem(item.key)}
+                    className="text-red-400 hover:text-red-300"
+                  >
+                    &times;
+                  </button>
+                </div>
+              </div>
+            ))}
+
+            <div className="mt-4">
+              <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-mora-white/50">
+                Add Item
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {products?.map((product) => (
+                  <button
+                    key={product._id}
+                    type="button"
+                    onClick={() => handleAddProductClick(product)}
+                    className="rounded-lg border border-white/10 bg-black/20 px-3 py-1.5 text-xs text-mora-white/70 hover:border-mora-gold hover:text-mora-white"
+                  >
+                    + {product.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-4 flex justify-between border-t border-white/10 pt-3 text-base font-bold text-mora-gold">
+              <span>Estimated Total (pre-bundle-discount)</span>
+              <span>Rs. {editTotal}</span>
+            </div>
+            <p className="text-xs text-mora-white/40">
+              Final total with bundle discount is recalculated automatically on save.
+            </p>
+
+            <div className="mt-4 flex gap-3">
+              <Button variant="ghost" className="flex-1" onClick={cancelEditing} disabled={saving}>
+                Cancel
+              </Button>
+              <Button className="flex-1" onClick={handleSaveEdit} disabled={saving}>
+                {saving ? 'Saving...' : 'Save Changes'}
+              </Button>
+            </div>
           </div>
-        </div>
+        ) : (
+          <>
+            <ul className="space-y-2 text-sm text-mora-white/80">
+              {order.items.map((item, i) => (
+                <li key={i} className="flex justify-between">
+                  <span>
+                    {item.name}
+                    {item.size ? ` (${item.size})` : ''} &times; {item.quantity}
+                  </span>
+                  <span>Rs. {item.unitPrice * item.quantity}</span>
+                </li>
+              ))}
+            </ul>
+            <div className="mt-3 border-t border-white/10 pt-3 text-sm text-mora-white/70">
+              <div className="flex justify-between"><span>Bundle Savings</span><span>Rs. {order.bundleSavings}</span></div>
+              <div className="mt-1 flex justify-between text-base font-bold text-mora-gold">
+                <span>Final Total</span><span>Rs. {order.finalTotal}</span>
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
       <div className="rounded-xl border border-white/10 bg-white/5 p-5">
@@ -207,6 +422,18 @@ export function AdminOrderDetailPage() {
         <Button variant="danger" onClick={handleDelete}>
           Delete Order
         </Button>
+      )}
+
+      {sizeModalProduct && (
+        <SizeSelectorModal
+          isOpen={Boolean(sizeModalProduct)}
+          onClose={() => setSizeModalProduct(null)}
+          onSelect={(size) => {
+            addItem(sizeModalProduct, size);
+            setSizeModalProduct(null);
+          }}
+          productName={sizeModalProduct.name}
+        />
       )}
     </div>
   );

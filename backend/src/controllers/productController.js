@@ -24,7 +24,7 @@ const createProduct = asyncHandler(async (req, res) => {
 
 const updateProduct = asyncHandler(async (req, res) => {
   const product = await Product.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
+    returnDocument: 'after',
     runValidators: true,
   });
   if (!product) throw new ApiError(404, 'Product not found');
@@ -43,7 +43,7 @@ const reorderImages = asyncHandler(async (req, res) => {
   const product = await Product.findByIdAndUpdate(
     req.params.id,
     { images },
-    { new: true, runValidators: true }
+    { returnDocument: 'after', runValidators: true }
   );
   if (!product) throw new ApiError(404, 'Product not found');
   res.json({ product });

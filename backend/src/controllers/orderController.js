@@ -6,21 +6,14 @@ const generateOrderId = require('../utils/generateOrderId');
 const { calculateTotal } = require('../utils/pricingEngine');
 const storageService = require('../services/storageService');
 
-const createOrder = asyncHandler(async (req, res) => {
-  const { fullName, indexOrNic, telephone, batch, faculty, department } = req.body;
-  const requestedItems = JSON.parse(req.body.items);
-
-  if (!req.file) {
-    throw new ApiError(400, 'Payment slip is required');
-  }
-
+async function buildOrderItemsAndPricing(requestedItems, { requireAvailable }) {
   const productIds = requestedItems.map((item) => item.productId);
   const products = await Product.find({ _id: { $in: productIds } });
   const productMap = new Map(products.map((p) => [p._id.toString(), p]));
 
   const orderItems = requestedItems.map((item) => {
     const product = productMap.get(item.productId);
-    if (!product || !product.available) {
+    if (!product || (requireAvailable && !product.available)) {
       throw new ApiError(400, `Product ${item.productId} is not available`);
     }
     if (product.category === 'tshirt' && !item.size) {
@@ -44,7 +37,21 @@ const createOrder = asyncHandler(async (req, res) => {
     .filter((i) => i.category === 'bangle')
     .reduce((sum, i) => sum + i.quantity, 0);
 
-  const pricing = calculateTotal(shirtCount, bangleCount);
+  return { orderItems, pricing: calculateTotal(shirtCount, bangleCount) };
+}
+
+const createOrder = asyncHandler(async (req, res) => {
+  const { fullName, indexOrNic, telephone, batch, faculty, department } = req.body;
+  const requestedItems = JSON.parse(req.body.items);
+
+  if (!req.file) {
+    throw new ApiError(400, 'Payment slip is required');
+  }
+
+  const { orderItems, pricing } = await buildOrderItemsAndPricing(requestedItems, {
+    requireAvailable: true,
+  });
+
   const orderId = await generateOrderId();
   const key = await storageService.uploadFile(req.file.buffer, req.file.originalname, req.file.mimetype);
 
@@ -110,12 +117,42 @@ const getOrder = asyncHandler(async (req, res) => {
   res.json({ order });
 });
 
+const updateOrder = asyncHandler(async (req, res) => {
+  const { fullName, indexOrNic, telephone, batch, faculty, department } = req.body;
+  const requestedItems = typeof req.body.items === 'string' ? JSON.parse(req.body.items) : req.body.items;
+
+  const { orderItems, pricing } = await buildOrderItemsAndPricing(requestedItems, {
+    requireAvailable: false,
+  });
+
+  const order = await Order.findOneAndUpdate(
+    { orderId: req.params.orderId },
+    {
+      fullName,
+      indexOrNic,
+      telephone,
+      batch,
+      faculty,
+      department,
+      items: orderItems,
+      bundleCount: pricing.bundleCount,
+      bundleSavings: pricing.bundleSavings,
+      subtotal: pricing.subtotal,
+      discount: pricing.bundleSavings,
+      finalTotal: pricing.finalTotal,
+    },
+    { returnDocument: 'after', runValidators: true }
+  );
+  if (!order) throw new ApiError(404, 'Order not found');
+  res.json({ order });
+});
+
 const updateStatus = asyncHandler(async (req, res) => {
   const { status } = req.body;
   const order = await Order.findOneAndUpdate(
     { orderId: req.params.orderId },
     { status },
-    { new: true, runValidators: true }
+    { returnDocument: 'after', runValidators: true }
   );
   if (!order) throw new ApiError(404, 'Order not found');
   res.json({ order });
@@ -126,7 +163,7 @@ const updateDistributed = asyncHandler(async (req, res) => {
   const order = await Order.findOneAndUpdate(
     { orderId: req.params.orderId },
     { distributed: Boolean(distributed), distributedAt: distributed ? new Date() : null },
-    { new: true, runValidators: true }
+    { returnDocument: 'after', runValidators: true }
   );
   if (!order) throw new ApiError(404, 'Order not found');
   res.json({ order });
@@ -139,7 +176,7 @@ const addNote = asyncHandler(async (req, res) => {
   const order = await Order.findOneAndUpdate(
     { orderId: req.params.orderId },
     { $push: { notes: { text: text.trim(), createdBy: req.admin.id } } },
-    { new: true }
+    { returnDocument: 'after' }
   );
   if (!order) throw new ApiError(404, 'Order not found');
   res.json({ order });
@@ -173,6 +210,7 @@ module.exports = {
   createOrder,
   listOrders,
   getOrder,
+  updateOrder,
   updateStatus,
   updateDistributed,
   addNote,
