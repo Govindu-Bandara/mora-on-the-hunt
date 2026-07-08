@@ -86,21 +86,30 @@ export function StepPaymentUpload() {
         />
       </div>
 
-      <label className="flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-white/20 p-8 text-center hover:border-mora-gold transition-colors">
-        <input
-          type="file"
-          accept=".jpg,.jpeg,.png,.pdf"
-          className="hidden"
-          onChange={handleFileChange}
-        />
-        {state.paymentFile ? (
+      {state.paymentFile ? (
+        <div className="flex items-center justify-between gap-3 rounded-lg border-2 border-dashed border-white/20 p-8">
           <span className="text-sm text-mora-white">
             {state.paymentFile.name} ({(state.paymentFile.size / 1024 / 1024).toFixed(2)} MB)
           </span>
-        ) : (
+          <button
+            type="button"
+            onClick={() => dispatch({ type: 'SET_PAYMENT_FILE', file: null })}
+            className="shrink-0 text-sm font-semibold text-red-400 hover:text-red-300"
+          >
+            Remove
+          </button>
+        </div>
+      ) : (
+        <label className="flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-white/20 p-8 text-center hover:border-mora-gold transition-colors">
+          <input
+            type="file"
+            accept=".jpg,.jpeg,.png,.pdf"
+            className="hidden"
+            onChange={handleFileChange}
+          />
           <span className="text-sm text-mora-white/50">Click to select your payment slip</span>
-        )}
-      </label>
+        </label>
+      )}
 
       <div className="flex gap-3">
         <Button
