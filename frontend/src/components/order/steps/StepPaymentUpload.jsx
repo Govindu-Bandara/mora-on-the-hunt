@@ -6,7 +6,7 @@ import { useOrderFlow } from '../../../hooks/useOrderFlow';
 import { submitOrder } from '../../../api/ordersApi';
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
-const MAX_SIZE_BYTES = 5 * 1024 * 1024;
+const MAX_SIZE_BYTES = 50 * 1024 * 1024;
 
 export function StepPaymentUpload() {
   const { state, dispatch } = useOrderFlow();
@@ -22,7 +22,7 @@ export function StepPaymentUpload() {
       return;
     }
     if (file.size > MAX_SIZE_BYTES) {
-      toast.error('File must be smaller than 5MB');
+      toast.error('File must be smaller than 50MB');
       e.target.value = '';
       return;
     }
@@ -70,7 +70,7 @@ export function StepPaymentUpload() {
     <div className="space-y-6">
       <h3 className="text-xl font-semibold text-mora-white">Upload Payment Slip</h3>
       <p className="text-sm text-mora-white/60">
-        Accepted formats: JPG, JPEG, PNG, PDF. Maximum size: 5MB.
+        Accepted formats: JPG, JPEG, PNG, PDF. Maximum size: 50MB.
       </p>
 
       <div>
