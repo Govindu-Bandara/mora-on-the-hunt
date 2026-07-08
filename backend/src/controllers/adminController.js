@@ -142,7 +142,7 @@ const getDistributionBreakdown = asyncHandler(async (req, res) => {
     },
   ]);
 
-  const productNames = [...new Set(breakdown.map((b) => b._id.name))].sort();
+  const productNames = [...new Set(breakdown.map((b) => b._id.name))];
 
   function cellFor(entries) {
     const total = entries.reduce((sum, e) => sum + e.qty, 0);
@@ -152,20 +152,27 @@ const getDistributionBreakdown = asyncHandler(async (req, res) => {
     return { total, distributed, remaining: total - distributed };
   }
 
-  const rows = productNames.map((name) => {
-    const entries = breakdown.filter((b) => b._id.name === name);
-    const category = entries[0]._id.category;
+  const CATEGORY_ORDER = { tshirt: 0, bangle: 1 };
 
-    if (category === 'tshirt') {
-      const bySize = {};
-      SIZES.forEach((size) => {
-        bySize[size] = cellFor(entries.filter((e) => e._id.size === size));
-      });
-      return { name, category, bySize, total: cellFor(entries) };
-    }
+  const rows = productNames
+    .map((name) => {
+      const entries = breakdown.filter((b) => b._id.name === name);
+      const category = entries[0]._id.category;
 
-    return { name, category, bySize: {}, total: cellFor(entries) };
-  });
+      if (category === 'tshirt') {
+        const bySize = {};
+        SIZES.forEach((size) => {
+          bySize[size] = cellFor(entries.filter((e) => e._id.size === size));
+        });
+        return { name, category, bySize, total: cellFor(entries) };
+      }
+
+      return { name, category, bySize: {}, total: cellFor(entries) };
+    })
+    .sort((a, b) => {
+      const categoryDiff = (CATEGORY_ORDER[a.category] ?? 99) - (CATEGORY_ORDER[b.category] ?? 99);
+      return categoryDiff !== 0 ? categoryDiff : a.name.localeCompare(b.name);
+    });
 
   res.json({ sizes: SIZES, rows });
 });
