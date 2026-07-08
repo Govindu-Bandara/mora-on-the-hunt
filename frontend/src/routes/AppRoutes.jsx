@@ -5,6 +5,7 @@ import { HomePage } from '../pages/HomePage';
 import { ProductDetailPage } from '../pages/ProductDetailPage';
 import { NotFoundPage } from '../pages/NotFoundPage';
 import { AdminLoginPage } from '../pages/admin/AdminLoginPage';
+import { UnauthorizedPage } from '../pages/admin/UnauthorizedPage';
 import { AdminDashboardPage } from '../pages/admin/AdminDashboardPage';
 import { AdminOrdersPage } from '../pages/admin/AdminOrdersPage';
 import { AdminOrderDetailPage } from '../pages/admin/AdminOrderDetailPage';
@@ -22,6 +23,7 @@ export function AppRoutes() {
       </Route>
 
       <Route path="/admin/login" element={<AdminLoginPage />} />
+      <Route path="/admin/unauthorized" element={<UnauthorizedPage />} />
 
       <Route element={<ProtectedRoute />}>
         <Route element={<AdminLayout />}>
