@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 
 const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
 const ORDER_STATUSES = ['Pending Verification', 'Verified', 'Completed', 'Cancelled'];
+const FACULTIES = ['Engineering', 'IT', 'Medicine', 'Architecture', 'Business'];
+const FACULTY_OPTIONS = FACULTIES.map((f) => `Faculty of ${f}`);
 
 const orderItemSchema = new mongoose.Schema(
   {
@@ -32,7 +34,7 @@ const orderSchema = new mongoose.Schema(
     indexOrNic: { type: String, required: true, trim: true },
     telephone: { type: String, required: true, trim: true },
     batch: { type: String, required: true, trim: true },
-    faculty: { type: String, required: true, trim: true },
+    faculty: { type: String, required: true, trim: true, enum: FACULTY_OPTIONS },
     department: { type: String, required: true, trim: true },
     items: { type: [orderItemSchema], required: true, validate: (v) => v.length > 0 },
     bundleCount: { type: Number, required: true, min: 0 },
@@ -40,6 +42,7 @@ const orderSchema = new mongoose.Schema(
     subtotal: { type: Number, required: true, min: 0 },
     discount: { type: Number, required: true, min: 0 },
     finalTotal: { type: Number, required: true, min: 0 },
+    paymentReference: { type: String, required: true, trim: true },
     paymentSlip: {
       key: { type: String, required: true },
       originalName: { type: String, required: true },
@@ -59,3 +62,5 @@ orderSchema.index({ fullName: 'text', telephone: 'text', indexOrNic: 'text' });
 module.exports = mongoose.model('Order', orderSchema);
 module.exports.SIZES = SIZES;
 module.exports.ORDER_STATUSES = ORDER_STATUSES;
+module.exports.FACULTIES = FACULTIES;
+module.exports.FACULTY_OPTIONS = FACULTY_OPTIONS;

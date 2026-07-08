@@ -61,7 +61,7 @@ describe('GET /api/admin/analytics distribution stats', () => {
       indexOrNic: '123',
       telephone: '0771234567',
       batch: '2020',
-      faculty: 'Engineering',
+      faculty: 'Faculty of Engineering',
       department: 'CSE',
       items: [
         {

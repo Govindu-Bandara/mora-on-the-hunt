@@ -15,6 +15,7 @@ import { fetchProducts } from '../../api/productsApi';
 import { Button } from '../../components/ui/Button';
 import { Spinner } from '../../components/ui/Spinner';
 import { Modal } from '../../components/ui/Modal';
+import { Select } from '../../components/ui/Select';
 import { SizeSelectorModal } from '../../components/order/SizeSelectorModal';
 import { useAuth } from '../../hooks/useAuth';
 
@@ -24,9 +25,10 @@ const CUSTOMER_FIELDS = [
   { name: 'indexOrNic', label: 'Index/NIC' },
   { name: 'telephone', label: 'Telephone' },
   { name: 'batch', label: 'Batch' },
-  { name: 'faculty', label: 'Faculty' },
   { name: 'department', label: 'Department' },
 ];
+const FACULTIES = ['Engineering', 'IT', 'Medicine', 'Architecture', 'Business'];
+const FACULTY_OPTIONS = FACULTIES.map((f) => ({ value: `Faculty of ${f}`, label: `Faculty of ${f}` }));
 
 function orderToEditState(order) {
   return {
@@ -267,6 +269,14 @@ export function AdminOrderDetailPage() {
                 />
               </div>
             ))}
+            <div>
+              <label className="mb-1 block text-xs text-mora-white/50">Faculty</label>
+              <Select
+                value={editState.customer.faculty}
+                onChange={(v) => updateCustomerField('faculty', v)}
+                options={FACULTY_OPTIONS}
+              />
+            </div>
           </div>
         ) : (
           <dl className="grid grid-cols-2 gap-3 text-sm text-mora-white/80">
@@ -377,6 +387,10 @@ export function AdminOrderDetailPage() {
         <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-mora-white/60">
           Payment Slip
         </h2>
+        <p className="mb-3 text-sm text-mora-white/80">
+          <span className="text-mora-white/50">Reference Number: </span>
+          {order.paymentReference || <span className="text-mora-white/40">Not provided</span>}
+        </p>
         {slipUrl ? (
           order.paymentSlip.mimetype === 'application/pdf' ? (
             <a href={slipUrl} target="_blank" rel="noreferrer" className="text-mora-gold underline">

@@ -41,7 +41,7 @@ async function buildOrderItemsAndPricing(requestedItems, { requireAvailable }) {
 }
 
 const createOrder = asyncHandler(async (req, res) => {
-  const { fullName, indexOrNic, telephone, batch, faculty, department } = req.body;
+  const { fullName, indexOrNic, telephone, batch, faculty, department, paymentReference } = req.body;
   const requestedItems = JSON.parse(req.body.items);
 
   if (!req.file) {
@@ -63,6 +63,7 @@ const createOrder = asyncHandler(async (req, res) => {
     batch,
     faculty,
     department,
+    paymentReference,
     items: orderItems,
     bundleCount: pricing.bundleCount,
     bundleSavings: pricing.bundleSavings,

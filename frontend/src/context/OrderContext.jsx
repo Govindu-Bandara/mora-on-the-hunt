@@ -16,6 +16,7 @@ const initialState = {
   },
   items: [],
   paymentFile: null,
+  paymentReference: '',
   lastOrder: null,
 };
 
@@ -66,6 +67,8 @@ function reducer(state, action) {
       return { ...state, items: state.items.filter((i) => i.key !== action.key) };
     case 'SET_PAYMENT_FILE':
       return { ...state, paymentFile: action.file };
+    case 'SET_PAYMENT_REFERENCE':
+      return { ...state, paymentReference: action.value };
     case 'SET_LAST_ORDER':
       return { ...state, lastOrder: action.order };
     case 'RESET':

@@ -1,5 +1,6 @@
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { Button } from '../../ui/Button';
+import { Select } from '../../ui/Select';
 import { useOrderFlow } from '../../../hooks/useOrderFlow';
 
 const FIELDS = [
@@ -7,9 +8,11 @@ const FIELDS = [
   { name: 'indexOrNic', label: 'Index Number or NIC Number' },
   { name: 'telephone', label: 'Telephone Number' },
   { name: 'batch', label: 'Batch' },
-  { name: 'faculty', label: 'Faculty' },
   { name: 'department', label: 'Department' },
 ];
+
+const FACULTIES = ['Engineering', 'IT', 'Medicine', 'Architecture', 'Business'];
+const FACULTY_OPTIONS = FACULTIES.map((f) => ({ value: `Faculty of ${f}`, label: `Faculty of ${f}` }));
 
 export function StepCustomerInfo() {
   const {
@@ -20,6 +23,7 @@ export function StepCustomerInfo() {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
   } = useForm({ defaultValues: customer });
 
@@ -46,6 +50,18 @@ export function StepCustomerInfo() {
           )}
         </div>
       ))}
+      <div>
+        <label className="mb-1 block text-sm text-mora-white/70">Faculty</label>
+        <Controller
+          name="faculty"
+          control={control}
+          rules={{ required: 'Faculty is required' }}
+          render={({ field }) => (
+            <Select value={field.value} onChange={field.onChange} options={FACULTY_OPTIONS} />
+          )}
+        />
+        {errors.faculty && <p className="mt-1 text-xs text-red-400">{errors.faculty.message}</p>}
+      </div>
       <div className="flex gap-3">
         <Button
           type="button"

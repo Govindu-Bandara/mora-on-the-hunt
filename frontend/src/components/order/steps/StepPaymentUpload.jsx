@@ -30,6 +30,10 @@ export function StepPaymentUpload() {
   }
 
   async function handleSubmit() {
+    if (!state.paymentReference.trim()) {
+      toast.error('Please enter the payment reference number');
+      return;
+    }
     if (!state.paymentFile) {
       toast.error('Please upload your payment slip');
       return;
@@ -39,6 +43,7 @@ export function StepPaymentUpload() {
     try {
       const formData = new FormData();
       Object.entries(state.customer).forEach(([key, value]) => formData.append(key, value));
+      formData.append('paymentReference', state.paymentReference.trim());
       formData.append(
         'items',
         JSON.stringify(
@@ -67,6 +72,19 @@ export function StepPaymentUpload() {
       <p className="text-sm text-mora-white/60">
         Accepted formats: JPG, JPEG, PNG, PDF. Maximum size: 5MB.
       </p>
+
+      <div>
+        <label htmlFor="paymentReference" className="mb-1 block text-sm text-mora-white/70">
+          Payment Reference Number
+        </label>
+        <input
+          id="paymentReference"
+          value={state.paymentReference}
+          onChange={(e) => dispatch({ type: 'SET_PAYMENT_REFERENCE', value: e.target.value })}
+          placeholder="e.g. the transaction/slip reference from your bank"
+          className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-mora-white placeholder-white/30 focus:border-mora-gold focus:outline-none"
+        />
+      </div>
 
       <label className="flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-white/20 p-8 text-center hover:border-mora-gold transition-colors">
         <input

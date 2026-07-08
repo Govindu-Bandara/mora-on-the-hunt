@@ -71,8 +71,9 @@ describe('POST /api/orders', () => {
       .field('indexOrNic', '200012345')
       .field('telephone', '0771234567')
       .field('batch', '2020')
-      .field('faculty', 'Engineering')
+      .field('faculty', 'Faculty of Engineering')
       .field('department', 'CSE')
+      .field('paymentReference', 'REF-TEST-123')
       .field('items', JSON.stringify(items))
       .field('tamperedTotal', '1')
       .attach('paymentSlip', testFilePath);
@@ -94,8 +95,9 @@ describe('POST /api/orders', () => {
       .field('indexOrNic', '200099999')
       .field('telephone', '0771234567')
       .field('batch', '2020')
-      .field('faculty', 'Engineering')
+      .field('faculty', 'Faculty of Engineering')
       .field('department', 'CSE')
+      .field('paymentReference', 'REF-TEST-123')
       .field('items', JSON.stringify([{ productId: shirt._id.toString(), size: 'M', quantity: 1 }]));
 
     expect(res.status).toBe(400);
@@ -112,8 +114,9 @@ describe('POST /api/orders', () => {
       .field('indexOrNic', '200011111')
       .field('telephone', '0771234567')
       .field('batch', '2020')
-      .field('faculty', 'Engineering')
+      .field('faculty', 'Faculty of Engineering')
       .field('department', 'CSE')
+      .field('paymentReference', 'REF-TEST-123')
       .field('items', JSON.stringify([{ productId: shirt._id.toString(), size: 'M', quantity: 1 }]))
       .attach('paymentSlip', badFile);
 
@@ -157,8 +160,9 @@ describe('PUT /api/orders/:orderId', () => {
       .field('indexOrNic', '200055555')
       .field('telephone', '0771234567')
       .field('batch', '2021')
-      .field('faculty', 'Engineering')
+      .field('faculty', 'Faculty of Engineering')
       .field('department', 'CSE')
+      .field('paymentReference', 'REF-TEST-123')
       .field('items', JSON.stringify([{ productId: shirt._id.toString(), size: 'M', quantity: 1 }]))
       .attach('paymentSlip', testFilePath);
 
@@ -173,7 +177,7 @@ describe('PUT /api/orders/:orderId', () => {
         indexOrNic: '200055555',
         telephone: '0779999999',
         batch: '2021',
-        faculty: 'Engineering',
+        faculty: 'Faculty of Engineering',
         department: 'CSE',
         items: [
           { productId: shirt._id.toString(), size: 'M', quantity: 1 },
