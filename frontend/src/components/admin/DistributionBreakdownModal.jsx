@@ -19,9 +19,13 @@ function Cell({ value }) {
 
 export function DistributionBreakdownModal({ isOpen, onClose }) {
   const [tab, setTab] = useState('total');
+  const [ndtOnly, setNdtOnly] = useState(false);
   const { data, loading } = useFetch(
-    () => (isOpen ? fetchDistributionBreakdown() : Promise.resolve(null)),
-    [isOpen]
+    () =>
+      isOpen
+        ? fetchDistributionBreakdown(ndtOnly ? { faculty: 'NDT' } : undefined)
+        : Promise.resolve(null),
+    [isOpen, ndtOnly]
   );
 
   return (
@@ -46,21 +50,32 @@ export function DistributionBreakdownModal({ isOpen, onClose }) {
           </button>
         </div>
 
-        <div className="mb-4 flex gap-2">
-          {TABS.map((t) => (
-            <button
-              key={t.key}
-              type="button"
-              onClick={() => setTab(t.key)}
-              className={`rounded-lg border px-4 py-2 text-sm font-semibold transition-colors ${
-                tab === t.key
-                  ? 'border-mora-gold bg-mora-gold/10 text-mora-gold'
-                  : 'border-white/10 bg-white/5 text-mora-white/60 hover:text-mora-white'
-              }`}
-            >
-              {t.label}
-            </button>
-          ))}
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex gap-2">
+            {TABS.map((t) => (
+              <button
+                key={t.key}
+                type="button"
+                onClick={() => setTab(t.key)}
+                className={`rounded-lg border px-4 py-2 text-sm font-semibold transition-colors ${
+                  tab === t.key
+                    ? 'border-mora-gold bg-mora-gold/10 text-mora-gold'
+                    : 'border-white/10 bg-white/5 text-mora-white/60 hover:text-mora-white'
+                }`}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+          <label className="flex items-center gap-2 text-sm text-mora-white/70">
+            <input
+              type="checkbox"
+              checked={ndtOnly}
+              onChange={(e) => setNdtOnly(e.target.checked)}
+              className="h-4 w-4 accent-mora-gold"
+            />
+            NDT only
+          </label>
         </div>
 
         {loading || !data ? (

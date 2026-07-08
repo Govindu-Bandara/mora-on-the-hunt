@@ -121,7 +121,13 @@ const getAnalytics = asyncHandler(async (req, res) => {
 });
 
 const getDistributionBreakdown = asyncHandler(async (req, res) => {
+  const matchStage =
+    typeof req.query.faculty === 'string' && req.query.faculty
+      ? [{ $match: { faculty: req.query.faculty } }]
+      : [];
+
   const breakdown = await Order.aggregate([
+    ...matchStage,
     { $unwind: '$items' },
     {
       $group: {

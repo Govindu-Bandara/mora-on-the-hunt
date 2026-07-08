@@ -33,7 +33,7 @@ export async function fetchAnalytics() {
   return data;
 }
 
-export async function fetchDistributionBreakdown() {
-  const { data } = await axiosClient.get('/admin/distribution-breakdown');
+export async function fetchDistributionBreakdown(params) {
+  const { data } = await axiosClient.get('/admin/distribution-breakdown', { params });
   return data;
 }
