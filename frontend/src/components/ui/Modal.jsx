@@ -4,6 +4,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 
 export function Modal({ isOpen, onClose, children, className = '', labelledBy }) {
   const containerRef = useRef(null);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
 
   useEffect(() => {
     if (!isOpen) return undefined;
@@ -17,7 +19,7 @@ export function Modal({ isOpen, onClose, children, className = '', labelledBy })
 
     function handleKeyDown(e) {
       if (e.key === 'Escape') {
-        onClose();
+        onCloseRef.current();
         return;
       }
       if (e.key !== 'Tab' || !focusable || focusable.length === 0) return;
@@ -41,7 +43,13 @@ export function Modal({ isOpen, onClose, children, className = '', labelledBy })
       document.body.style.overflow = '';
       previouslyFocused?.focus?.();
     };
-  }, [isOpen, onClose]);
+    // Deliberately excludes `onClose` — this effect must only re-run when the
+    // modal actually opens/closes, not on every parent re-render (which
+    // creates a new inline onClose reference and would otherwise steal
+    // focus back to the first focusable element on every keystroke inside
+    // the modal). onCloseRef always holds the latest callback.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
 
   return createPortal(
     <AnimatePresence>
