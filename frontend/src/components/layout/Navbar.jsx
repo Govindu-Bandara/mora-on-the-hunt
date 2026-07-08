@@ -34,11 +34,15 @@ export function Navbar() {
       }`}
     >
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-        <Link
-          to="/"
-          className="text-sm font-black uppercase tracking-[0.25em] text-mora-gold"
-        >
-          MORA Baseball
+        <Link to="/" className="flex items-center gap-2.5">
+          <img
+            src="/WhatsApp_Image_2026-07-06_at_11.37.36-removebg-preview.png"
+            alt="MORA Baseball"
+            className="h-8 w-auto brightness-0 invert"
+          />
+          <span className="text-sm font-black uppercase tracking-[0.25em] text-mora-gold">
+            MORA Baseball
+          </span>
         </Link>
         <div className="hidden items-center gap-10 text-xs font-bold uppercase tracking-[0.2em] text-mora-white/70 md:flex">
           {LINKS.map((link) => (

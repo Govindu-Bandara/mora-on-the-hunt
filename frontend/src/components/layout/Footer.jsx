@@ -1,6 +1,11 @@
 export function Footer() {
   return (
     <footer className="border-t-4 border-mora-gold bg-mora-black px-6 py-12 text-center text-sm text-mora-white/60">
+      <img
+        src="/WhatsApp_Image_2026-07-06_at_11.37.36-removebg-preview.png"
+        alt="MORA Baseball"
+        className="mx-auto mb-4 h-10 w-auto brightness-0 invert"
+      />
       <p className="font-slogan mb-3 text-xl text-mora-gold">#MORA on the Hunt</p>
       <p className="mb-1 text-xs font-bold uppercase tracking-[0.2em] text-mora-white/50">
         Organized independently by MORA Baseball
