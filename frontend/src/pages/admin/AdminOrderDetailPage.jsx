@@ -20,15 +20,22 @@ import { SizeSelectorModal } from '../../components/order/SizeSelectorModal';
 import { useAuth } from '../../hooks/useAuth';
 
 const STATUSES = ['Pending Verification', 'Verified', 'Completed', 'Cancelled'];
-const CUSTOMER_FIELDS = [
+const CUSTOMER_FIELDS_BEFORE_FACULTY = [
   { name: 'fullName', label: 'Full Name' },
   { name: 'indexOrNic', label: 'Index/NIC' },
   { name: 'telephone', label: 'Telephone' },
   { name: 'batch', label: 'Batch' },
-  { name: 'department', label: 'Department' },
 ];
-const FACULTIES = ['Engineering', 'IT', 'Medicine', 'Architecture', 'Business'];
-const FACULTY_OPTIONS = FACULTIES.map((f) => ({ value: `Faculty of ${f}`, label: `Faculty of ${f}` }));
+const CUSTOMER_FIELDS_AFTER_FACULTY = [{ name: 'department', label: 'Department' }];
+const FACULTY_VALUES = [
+  'Faculty of Engineering',
+  'Faculty of IT',
+  'Faculty of Medicine',
+  'Faculty of Architecture',
+  'Faculty of Business',
+  'NDT',
+];
+const FACULTY_OPTIONS = FACULTY_VALUES.map((f) => ({ value: f, label: f }));
 
 function orderToEditState(order) {
   return {
@@ -259,7 +266,7 @@ export function AdminOrderDetailPage() {
         </h2>
         {isEditing ? (
           <div className="grid grid-cols-2 gap-3">
-            {CUSTOMER_FIELDS.map((field) => (
+            {CUSTOMER_FIELDS_BEFORE_FACULTY.map((field) => (
               <div key={field.name}>
                 <label className="mb-1 block text-xs text-mora-white/50">{field.label}</label>
                 <input
@@ -277,6 +284,16 @@ export function AdminOrderDetailPage() {
                 options={FACULTY_OPTIONS}
               />
             </div>
+            {CUSTOMER_FIELDS_AFTER_FACULTY.map((field) => (
+              <div key={field.name}>
+                <label className="mb-1 block text-xs text-mora-white/50">{field.label}</label>
+                <input
+                  value={editState.customer[field.name]}
+                  onChange={(e) => updateCustomerField(field.name, e.target.value)}
+                  className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-mora-white focus:border-mora-gold focus:outline-none"
+                />
+              </div>
+            ))}
           </div>
         ) : (
           <dl className="grid grid-cols-2 gap-3 text-sm text-mora-white/80">

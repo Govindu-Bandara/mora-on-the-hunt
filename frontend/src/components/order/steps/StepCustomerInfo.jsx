@@ -3,16 +3,23 @@ import { Button } from '../../ui/Button';
 import { Select } from '../../ui/Select';
 import { useOrderFlow } from '../../../hooks/useOrderFlow';
 
-const FIELDS = [
+const FIELDS_BEFORE_FACULTY = [
   { name: 'fullName', label: 'Full Name' },
   { name: 'indexOrNic', label: 'Index Number or NIC Number' },
   { name: 'telephone', label: 'Telephone Number' },
   { name: 'batch', label: 'Batch' },
-  { name: 'department', label: 'Department' },
 ];
+const FIELDS_AFTER_FACULTY = [{ name: 'department', label: 'Department' }];
 
-const FACULTIES = ['Engineering', 'IT', 'Medicine', 'Architecture', 'Business'];
-const FACULTY_OPTIONS = FACULTIES.map((f) => ({ value: `Faculty of ${f}`, label: `Faculty of ${f}` }));
+const FACULTY_VALUES = [
+  'Faculty of Engineering',
+  'Faculty of IT',
+  'Faculty of Medicine',
+  'Faculty of Architecture',
+  'Faculty of Business',
+  'NDT',
+];
+const FACULTY_OPTIONS = FACULTY_VALUES.map((f) => ({ value: f, label: f }));
 
 export function StepCustomerInfo() {
   const {
@@ -32,24 +39,28 @@ export function StepCustomerInfo() {
     dispatch({ type: 'SET_STEP', step: 3 });
   }
 
+  function renderField(field) {
+    return (
+      <div key={field.name}>
+        <label htmlFor={field.name} className="mb-1 block text-sm text-mora-white/70">
+          {field.label}
+        </label>
+        <input
+          id={field.name}
+          {...register(field.name, { required: `${field.label} is required` })}
+          className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-mora-white placeholder-white/30 focus:border-mora-gold focus:outline-none"
+        />
+        {errors[field.name] && (
+          <p className="mt-1 text-xs text-red-400">{errors[field.name].message}</p>
+        )}
+      </div>
+    );
+  }
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <h3 className="text-xl font-semibold text-mora-white">Your Information</h3>
-      {FIELDS.map((field) => (
-        <div key={field.name}>
-          <label htmlFor={field.name} className="mb-1 block text-sm text-mora-white/70">
-            {field.label}
-          </label>
-          <input
-            id={field.name}
-            {...register(field.name, { required: `${field.label} is required` })}
-            className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-mora-white placeholder-white/30 focus:border-mora-gold focus:outline-none"
-          />
-          {errors[field.name] && (
-            <p className="mt-1 text-xs text-red-400">{errors[field.name].message}</p>
-          )}
-        </div>
-      ))}
+      {FIELDS_BEFORE_FACULTY.map(renderField)}
       <div>
         <label className="mb-1 block text-sm text-mora-white/70">Faculty</label>
         <Controller
@@ -62,6 +73,7 @@ export function StepCustomerInfo() {
         />
         {errors.faculty && <p className="mt-1 text-xs text-red-400">{errors.faculty.message}</p>}
       </div>
+      {FIELDS_AFTER_FACULTY.map(renderField)}
       <div className="flex gap-3">
         <Button
           type="button"

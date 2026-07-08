@@ -2,8 +2,14 @@ const mongoose = require('mongoose');
 
 const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
 const ORDER_STATUSES = ['Pending Verification', 'Verified', 'Completed', 'Cancelled'];
-const FACULTIES = ['Engineering', 'IT', 'Medicine', 'Architecture', 'Business'];
-const FACULTY_OPTIONS = FACULTIES.map((f) => `Faculty of ${f}`);
+const FACULTY_OPTIONS = [
+  'Faculty of Engineering',
+  'Faculty of IT',
+  'Faculty of Medicine',
+  'Faculty of Architecture',
+  'Faculty of Business',
+  'NDT',
+];
 
 const orderItemSchema = new mongoose.Schema(
   {
@@ -62,5 +68,4 @@ orderSchema.index({ fullName: 'text', telephone: 'text', indexOrNic: 'text' });
 module.exports = mongoose.model('Order', orderSchema);
 module.exports.SIZES = SIZES;
 module.exports.ORDER_STATUSES = ORDER_STATUSES;
-module.exports.FACULTIES = FACULTIES;
 module.exports.FACULTY_OPTIONS = FACULTY_OPTIONS;
