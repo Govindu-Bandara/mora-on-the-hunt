@@ -17,6 +17,7 @@ import { Spinner } from '../../components/ui/Spinner';
 import { Modal } from '../../components/ui/Modal';
 import { Select } from '../../components/ui/Select';
 import { SizeSelectorModal } from '../../components/order/SizeSelectorModal';
+import { BatchSelectField } from '../../components/order/BatchSelectField';
 import { useAuth } from '../../hooks/useAuth';
 
 const STATUSES = ['Pending Verification', 'Verified', 'Completed', 'Cancelled'];
@@ -24,7 +25,6 @@ const CUSTOMER_FIELDS_BEFORE_FACULTY = [
   { name: 'fullName', label: 'Full Name' },
   { name: 'indexOrNic', label: 'Index/NIC' },
   { name: 'telephone', label: 'Telephone' },
-  { name: 'batch', label: 'Batch' },
 ];
 const CUSTOMER_FIELDS_AFTER_FACULTY = [{ name: 'department', label: 'Department' }];
 const FACULTY_VALUES = [
@@ -276,6 +276,13 @@ export function AdminOrderDetailPage() {
                 />
               </div>
             ))}
+            <div>
+              <label className="mb-1 block text-xs text-mora-white/50">Batch</label>
+              <BatchSelectField
+                value={editState.customer.batch}
+                onChange={(v) => updateCustomerField('batch', v)}
+              />
+            </div>
             <div>
               <label className="mb-1 block text-xs text-mora-white/50">Faculty</label>
               <Select

@@ -1,13 +1,13 @@
 import { Controller, useForm } from 'react-hook-form';
 import { Button } from '../../ui/Button';
 import { Select } from '../../ui/Select';
+import { BatchSelectField } from '../BatchSelectField';
 import { useOrderFlow } from '../../../hooks/useOrderFlow';
 
 const FIELDS_BEFORE_FACULTY = [
   { name: 'fullName', label: 'Full Name' },
   { name: 'indexOrNic', label: 'Index Number or NIC Number' },
   { name: 'telephone', label: 'Telephone Number' },
-  { name: 'batch', label: 'Batch' },
 ];
 const FIELDS_AFTER_FACULTY = [{ name: 'department', label: 'Department' }];
 
@@ -61,6 +61,18 @@ export function StepCustomerInfo() {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <h3 className="text-xl font-semibold text-mora-white">Your Information</h3>
       {FIELDS_BEFORE_FACULTY.map(renderField)}
+      <div>
+        <label className="mb-1 block text-sm text-mora-white/70">Batch</label>
+        <Controller
+          name="batch"
+          control={control}
+          rules={{ required: 'Batch is required' }}
+          render={({ field }) => (
+            <BatchSelectField value={field.value} onChange={field.onChange} />
+          )}
+        />
+        {errors.batch && <p className="mt-1 text-xs text-red-400">{errors.batch.message}</p>}
+      </div>
       <div>
         <label className="mb-1 block text-sm text-mora-white/70">Faculty</label>
         <Controller
