@@ -148,7 +148,7 @@ export function AdminOrdersPage() {
                   onClick={() => navigate(`/admin/orders/${order.orderId}`)}
                   className={`cursor-pointer border-t border-white/5 text-mora-white/80 transition-colors ${
                     order.flagged
-                      ? 'bg-gradient-to-r from-red-900/50 via-red-900/25 to-transparent hover:from-red-900/60'
+                      ? 'bg-red-900/60 hover:bg-red-900/70'
                       : 'hover:bg-white/5'
                   }`}
                 >
