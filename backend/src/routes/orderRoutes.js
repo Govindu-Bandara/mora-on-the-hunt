@@ -6,6 +6,7 @@ const {
   updateOrder,
   updateStatus,
   updateDistributed,
+  updateFlagged,
   addNote,
   deleteOrder,
   downloadPaymentSlip,
@@ -30,6 +31,7 @@ router.get('/:orderId/payment-slip', verifyJWT, downloadPaymentSlip);
 router.put('/:orderId', verifyJWT, updateOrderValidator, validate, updateOrder);
 router.patch('/:orderId/status', verifyJWT, updateStatus);
 router.patch('/:orderId/distributed', verifyJWT, updateDistributed);
+router.patch('/:orderId/flag', verifyJWT, updateFlagged);
 router.patch('/:orderId/notes', verifyJWT, addNote);
 router.delete('/:orderId', verifyJWT, requireRole('superadmin'), deleteOrder);
 

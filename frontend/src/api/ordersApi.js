@@ -32,6 +32,11 @@ export async function updateOrderDistributed(orderId, distributed) {
   return data.order;
 }
 
+export async function updateOrderFlagged(orderId, flagged) {
+  const { data } = await axiosClient.patch(`/orders/${orderId}/flag`, { flagged });
+  return data.order;
+}
+
 export async function addOrderNote(orderId, text) {
   const { data } = await axiosClient.patch(`/orders/${orderId}/notes`, { text });
   return data.order;

@@ -170,6 +170,17 @@ const updateDistributed = asyncHandler(async (req, res) => {
   res.json({ order });
 });
 
+const updateFlagged = asyncHandler(async (req, res) => {
+  const { flagged } = req.body;
+  const order = await Order.findOneAndUpdate(
+    { orderId: req.params.orderId },
+    { flagged: Boolean(flagged) },
+    { returnDocument: 'after', runValidators: true }
+  );
+  if (!order) throw new ApiError(404, 'Order not found');
+  res.json({ order });
+});
+
 const addNote = asyncHandler(async (req, res) => {
   const { text } = req.body;
   if (!text || !text.trim()) throw new ApiError(400, 'Note text is required');
@@ -214,6 +225,7 @@ module.exports = {
   updateOrder,
   updateStatus,
   updateDistributed,
+  updateFlagged,
   addNote,
   deleteOrder,
   downloadPaymentSlip,

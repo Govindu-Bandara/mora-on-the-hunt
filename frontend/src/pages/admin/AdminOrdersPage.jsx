@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useFetch } from '../../hooks/useFetch';
-import { fetchOrders, updateOrderDistributed } from '../../api/ordersApi';
+import { fetchOrders, updateOrderDistributed, updateOrderFlagged } from '../../api/ordersApi';
 import { fetchAnalytics } from '../../api/authApi';
 import { Spinner } from '../../components/ui/Spinner';
 import { Select } from '../../components/ui/Select';
@@ -73,6 +73,17 @@ export function AdminOrdersPage() {
     }
   }
 
+  async function handleToggleFlagged(e, order) {
+    e.stopPropagation();
+    try {
+      await updateOrderFlagged(order.orderId, !order.flagged);
+      toast.success(order.flagged ? 'Flag removed' : 'Order flagged');
+      refetch();
+    } catch {
+      toast.error('Failed to update flag');
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -126,6 +137,7 @@ export function AdminOrdersPage() {
                 <th className="px-4 py-3">Total</th>
                 <th className="px-4 py-3">Status</th>
                 <th className="px-4 py-3">Distributed</th>
+                <th className="px-4 py-3">Flag</th>
                 <th className="px-4 py-3">Date</th>
               </tr>
             </thead>
@@ -134,7 +146,11 @@ export function AdminOrdersPage() {
                 <tr
                   key={order._id}
                   onClick={() => navigate(`/admin/orders/${order.orderId}`)}
-                  className="cursor-pointer border-t border-white/5 text-mora-white/80 hover:bg-white/5"
+                  className={`cursor-pointer border-t border-white/5 text-mora-white/80 transition-colors ${
+                    order.flagged
+                      ? 'bg-gradient-to-r from-red-900/50 via-red-900/25 to-transparent hover:from-red-900/60'
+                      : 'hover:bg-white/5'
+                  }`}
                 >
                   <td className="px-4 py-3 font-medium text-mora-gold">{order.orderId}</td>
                   <td className="px-4 py-3">{order.fullName}</td>
@@ -159,12 +175,28 @@ export function AdminOrdersPage() {
                       </span>
                     </label>
                   </td>
+                  <td className="px-4 py-3">
+                    <label
+                      className="flex items-center gap-2"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={order.flagged}
+                        onChange={(e) => handleToggleFlagged(e, order)}
+                        className="h-4 w-4 accent-red-600"
+                      />
+                      <span className={order.flagged ? 'text-red-400' : 'text-mora-white/40'}>
+                        {order.flagged ? 'Flagged' : 'No'}
+                      </span>
+                    </label>
+                  </td>
                   <td className="px-4 py-3">{new Date(order.createdAt).toLocaleDateString()}</td>
                 </tr>
               ))}
               {data?.orders.length === 0 && (
                 <tr>
-                  <td colSpan={9} className="px-4 py-8 text-center text-mora-white/50">
+                  <td colSpan={10} className="px-4 py-8 text-center text-mora-white/50">
                     No orders found.
                   </td>
                 </tr>

@@ -59,6 +59,7 @@ const orderSchema = new mongoose.Schema(
     notes: { type: [noteSchema], default: [] },
     distributed: { type: Boolean, default: false },
     distributedAt: { type: Date, default: null },
+    flagged: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

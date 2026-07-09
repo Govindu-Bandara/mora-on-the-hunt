@@ -7,6 +7,7 @@ import {
   updateOrder,
   updateOrderStatus,
   updateOrderDistributed,
+  updateOrderFlagged,
   addOrderNote,
   deleteOrder,
   fetchPaymentSlipBlob,
@@ -185,6 +186,16 @@ export function AdminOrderDetailPage() {
     }
   }
 
+  async function handleToggleFlagged() {
+    try {
+      await updateOrderFlagged(orderId, !order.flagged);
+      toast.success(order.flagged ? 'Flag removed' : 'Order flagged');
+      refetch();
+    } catch {
+      toast.error('Failed to update flag');
+    }
+  }
+
   async function handleAddNote() {
     if (!noteText.trim()) return;
     try {
@@ -245,6 +256,17 @@ export function AdminOrderDetailPage() {
             }`}
           >
             {order.distributed ? '✓ Distributed' : 'Mark as Distributed'}
+          </button>
+          <button
+            type="button"
+            onClick={handleToggleFlagged}
+            className={`rounded-lg border px-4 py-2 text-sm font-semibold transition-colors ${
+              order.flagged
+                ? 'border-red-500/40 bg-red-500/10 text-red-400'
+                : 'border-white/10 bg-white/5 text-mora-white/70 hover:border-red-400'
+            }`}
+          >
+            {order.flagged ? '🚩 Flagged' : 'Flag Order'}
           </button>
           <select
             value={order.status}
