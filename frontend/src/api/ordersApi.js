@@ -46,6 +46,14 @@ export async function deleteOrder(orderId) {
   await axiosClient.delete(`/orders/${orderId}`);
 }
 
+export async function downloadOrdersPdf(range) {
+  const { data } = await axiosClient.get('/orders/export', {
+    params: { range },
+    responseType: 'blob',
+  });
+  return data;
+}
+
 export async function fetchPaymentSlipBlob(orderId) {
   const { data, headers } = await axiosClient.get(`/orders/${orderId}/payment-slip`, {
     responseType: 'blob',

@@ -5,6 +5,8 @@ const asyncHandler = require('../utils/asyncHandler');
 const generateOrderId = require('../utils/generateOrderId');
 const { calculateTotal } = require('../utils/pricingEngine');
 const storageService = require('../services/storageService');
+const PDFDocument = require('pdfkit');
+const { renderOrdersPdf, colomboDayRangeUtc, colomboDateString } = require('../utils/ordersPdf');
 
 async function buildOrderItemsAndPricing(requestedItems, { requireAvailable }) {
   const productIds = requestedItems.map((item) => item.productId);
@@ -86,7 +88,7 @@ const createOrder = asyncHandler(async (req, res) => {
 });
 
 const listOrders = asyncHandler(async (req, res) => {
-  const { status, batch, faculty, distributed, search, page = 1, limit = 20, sort = '-createdAt' } =
+  const { status, batch, faculty, distributed, flagged, search, page = 1, limit = 20, sort = '-createdAt' } =
     req.query;
 
   const filter = {};
@@ -96,6 +98,8 @@ const listOrders = asyncHandler(async (req, res) => {
   if (distributed === 'true' || distributed === 'false') {
     filter.distributed = distributed === 'true';
   }
+  if (flagged === 'true') filter.flagged = true;
+  else if (flagged === 'false') filter.flagged = { $ne: true }; // include legacy docs missing the field
   if (search) filter.$text = { $search: search };
 
   const pageNum = Math.max(1, Number(page));
@@ -110,6 +114,29 @@ const listOrders = asyncHandler(async (req, res) => {
   ]);
 
   res.json({ orders, total, page: pageNum, pages: Math.ceil(total / limitNum) });
+});
+
+const exportOrdersPdf = asyncHandler(async (req, res) => {
+  const range = req.query.range === 'today' ? 'today' : 'all';
+
+  const filter = {};
+  let rangeLabel = 'All orders';
+  if (range === 'today') {
+    const { start, end } = colomboDayRangeUtc();
+    filter.createdAt = { $gte: start, $lte: end };
+    rangeLabel = `Today (${colomboDateString()})`;
+  }
+
+  const orders = await Order.find(filter).sort('createdAt');
+
+  const filename = `mora-orders-${range}-${colomboDateString()}.pdf`;
+  res.setHeader('Content-Type', 'application/pdf');
+  res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+
+  const doc = new PDFDocument({ size: 'A4', layout: 'landscape', margin: 40 });
+  doc.pipe(res);
+  renderOrdersPdf(doc, orders, { rangeLabel });
+  doc.end();
 });
 
 const getOrder = asyncHandler(async (req, res) => {
@@ -221,6 +248,7 @@ const downloadPaymentSlip = asyncHandler(async (req, res) => {
 module.exports = {
   createOrder,
   listOrders,
+  exportOrdersPdf,
   getOrder,
   updateOrder,
   updateStatus,

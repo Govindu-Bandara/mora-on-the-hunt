@@ -2,6 +2,7 @@ const express = require('express');
 const {
   createOrder,
   listOrders,
+  exportOrdersPdf,
   getOrder,
   updateOrder,
   updateStatus,
@@ -26,6 +27,7 @@ router.post(
   createOrder
 );
 router.get('/', verifyJWT, listOrders);
+router.get('/export', verifyJWT, exportOrdersPdf); // must precede '/:orderId'
 router.get('/:orderId', verifyJWT, getOrder);
 router.get('/:orderId/payment-slip', verifyJWT, downloadPaymentSlip);
 router.put('/:orderId', verifyJWT, updateOrderValidator, validate, updateOrder);

@@ -196,3 +196,75 @@ describe('PUT /api/orders/:orderId', () => {
     expect(res.status).toBe(401);
   });
 });
+
+describe('Flag filter and PDF export', () => {
+  let token;
+
+  function buildOrder(overrides) {
+    return {
+      orderId: `MORA-TEST-${Math.random().toString(36).slice(2, 8)}`,
+      fullName: 'Filter Test',
+      indexOrNic: '200077777',
+      telephone: '0771234567',
+      batch: '2022',
+      faculty: 'Faculty of Engineering',
+      department: 'CSE',
+      paymentReference: 'REF-FLAG',
+      items: [
+        { product: new mongoose.Types.ObjectId(), name: 'White T-Shirt', category: 'tshirt', color: 'White', size: 'M', quantity: 1, unitPrice: 1700 },
+      ],
+      bundleCount: 0,
+      bundleSavings: 0,
+      subtotal: 1700,
+      discount: 0,
+      finalTotal: 1700,
+      paymentSlip: { key: 'payment-slips/x.jpg', originalName: 'x.jpg', mimetype: 'image/jpeg', size: 10 },
+      ...overrides,
+    };
+  }
+
+  beforeAll(async () => {
+    // eslint-disable-next-line global-require
+    const Admin = require('../src/models/Admin');
+    // eslint-disable-next-line global-require
+    const jwt = require('jsonwebtoken');
+    const hashed = await Admin.hashPassword('password123');
+    const admin = await Admin.create({
+      name: 'Export Test Admin',
+      email: 'export-admin@test.com',
+      password: hashed,
+      role: 'admin',
+    });
+    token = jwt.sign({ id: admin._id, role: admin.role }, process.env.JWT_SECRET);
+
+    await Order.create(buildOrder({ flagged: true }));
+    await Order.create(buildOrder({ flagged: false }));
+  });
+
+  test('GET /api/orders?flagged=true returns only flagged orders', async () => {
+    const res = await request(app)
+      .get('/api/orders')
+      .query({ flagged: 'true', limit: 100 })
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.orders.length).toBeGreaterThan(0);
+    expect(res.body.orders.every((o) => o.flagged === true)).toBe(true);
+  });
+
+  test('GET /api/orders/export?range=all returns a PDF for an authed admin', async () => {
+    const res = await request(app)
+      .get('/api/orders/export')
+      .query({ range: 'all' })
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.headers['content-type']).toBe('application/pdf');
+    expect(res.headers['content-disposition']).toMatch(/attachment; filename="mora-orders-all-/);
+  });
+
+  test('GET /api/orders/export is rejected without a token', async () => {
+    const res = await request(app).get('/api/orders/export').query({ range: 'today' });
+    expect(res.status).toBe(401);
+  });
+});

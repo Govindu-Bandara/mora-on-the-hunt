@@ -2,17 +2,28 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useFetch } from '../../hooks/useFetch';
-import { fetchOrders, updateOrderDistributed, updateOrderFlagged } from '../../api/ordersApi';
+import { fetchOrders, updateOrderDistributed, updateOrderFlagged, downloadOrdersPdf } from '../../api/ordersApi';
 import { fetchAnalytics } from '../../api/authApi';
 import { Spinner } from '../../components/ui/Spinner';
 import { Select } from '../../components/ui/Select';
 import { DistributionBreakdownModal } from '../../components/admin/DistributionBreakdownModal';
 
-const DISTRIBUTED_OPTIONS = [
+const FILTER_OPTIONS = [
   { value: '', label: 'All (Distributed & Pending)' },
-  { value: 'false', label: 'Not Distributed' },
-  { value: 'true', label: 'Distributed' },
+  { value: 'dist_false', label: 'Not Distributed' },
+  { value: 'dist_true', label: 'Distributed' },
+  { value: 'flag_true', label: 'Flagged' },
+  { value: 'flag_false', label: 'Not Flagged' },
 ];
+
+// Translate the merged filter dropdown value into the right query param.
+function filterToParams(filter) {
+  if (filter === 'dist_true') return { distributed: 'true' };
+  if (filter === 'dist_false') return { distributed: 'false' };
+  if (filter === 'flag_true') return { flagged: 'true' };
+  if (filter === 'flag_false') return { flagged: 'false' };
+  return {};
+}
 
 function DistributionSummary({ analytics }) {
   if (!analytics) return null;
@@ -45,19 +56,20 @@ function DistributionSummary({ analytics }) {
 export function AdminOrdersPage() {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
-  const [distributed, setDistributed] = useState('');
+  const [filter, setFilter] = useState('');
   const [page, setPage] = useState(1);
   const [breakdownOpen, setBreakdownOpen] = useState(false);
+  const [downloading, setDownloading] = useState(null);
 
   const { data, loading, refetch } = useFetch(
     () =>
       fetchOrders({
         search: search || undefined,
-        distributed: distributed || undefined,
+        ...filterToParams(filter),
         page,
         limit: 20,
       }),
-    [search, distributed, page]
+    [search, filter, page]
   );
   const { data: analytics, refetch: refetchAnalytics } = useFetch(fetchAnalytics, []);
 
@@ -84,17 +96,54 @@ export function AdminOrdersPage() {
     }
   }
 
+  async function handleDownloadPdf(range) {
+    setDownloading(range);
+    try {
+      const blob = await downloadOrdersPdf(range);
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `mora-orders-${range}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    } catch {
+      toast.error('Failed to generate PDF');
+    } finally {
+      setDownloading(null);
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold text-mora-white">Orders</h1>
-        <button
-          type="button"
-          onClick={() => setBreakdownOpen(true)}
-          className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-mora-white/70 hover:border-mora-gold hover:text-mora-white"
-        >
-          Distribution Breakdown
-        </button>
+        <div className="flex flex-wrap gap-3">
+          <button
+            type="button"
+            disabled={downloading !== null}
+            onClick={() => handleDownloadPdf('today')}
+            className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-mora-white/70 hover:border-mora-gold hover:text-mora-white disabled:opacity-50"
+          >
+            {downloading === 'today' ? 'Preparing...' : 'Download Today (PDF)'}
+          </button>
+          <button
+            type="button"
+            disabled={downloading !== null}
+            onClick={() => handleDownloadPdf('all')}
+            className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-mora-white/70 hover:border-mora-gold hover:text-mora-white disabled:opacity-50"
+          >
+            {downloading === 'all' ? 'Preparing...' : 'Download All (PDF)'}
+          </button>
+          <button
+            type="button"
+            onClick={() => setBreakdownOpen(true)}
+            className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-mora-white/70 hover:border-mora-gold hover:text-mora-white"
+          >
+            Distribution Breakdown
+          </button>
+        </div>
       </div>
 
       <DistributionSummary analytics={analytics} />
@@ -110,12 +159,12 @@ export function AdminOrdersPage() {
           className="flex-1 min-w-[200px] rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-mora-white focus:border-mora-gold focus:outline-none"
         />
         <Select
-          value={distributed}
+          value={filter}
           onChange={(v) => {
             setPage(1);
-            setDistributed(v);
+            setFilter(v);
           }}
-          options={DISTRIBUTED_OPTIONS}
+          options={FILTER_OPTIONS}
           className="w-60"
         />
       </div>

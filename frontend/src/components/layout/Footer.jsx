@@ -10,6 +10,16 @@ export function Footer() {
       <p className="mb-1 text-xs font-bold uppercase tracking-[0.2em] text-mora-white/50">
         Organized independently by MORA Baseball
       </p>
+      <p className="mt-3 text-sm text-mora-white/50">
+        Contact:{' '}
+        <a href="tel:0764172394" className="font-medium hover:text-mora-gold">
+          Akila 0764172394
+        </a>
+        <span className="mx-2 text-mora-white/30">·</span>
+        <a href="tel:0713902158" className="font-medium hover:text-mora-gold">
+          Nethindu 0713902158
+        </a>
+      </p>
       <p className="mx-auto mt-4 max-w-xl px-6 text-mora-white/40">
         This is not an official University of Moratuwa website or merchandise store. It is an
         independent campaign organized by the MORA Baseball team to build excitement for the
