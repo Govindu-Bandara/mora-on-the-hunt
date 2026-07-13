@@ -3,6 +3,7 @@ import toast from 'react-hot-toast';
 import { Button } from '../../ui/Button';
 import { Spinner } from '../../ui/Spinner';
 import { SizeSelectorModal } from '../SizeSelectorModal';
+import { SizeChartModal } from '../SizeChartModal';
 import { CartSidebar } from '../CartSidebar';
 import { useOrderFlow } from '../../../hooks/useOrderFlow';
 import { useFetch } from '../../../hooks/useFetch';
@@ -31,6 +32,7 @@ export function StepMerchSelection() {
   const { state, dispatch } = useOrderFlow();
   const { data: products, loading } = useFetch(() => fetchProducts(), []);
   const [sizeModal, setSizeModal] = useState(null);
+  const [sizeChartOpen, setSizeChartOpen] = useState(false);
 
   function handleAdd(product) {
     if (product.category === 'tshirt') {
@@ -58,7 +60,16 @@ export function StepMerchSelection() {
   return (
     <div className="grid gap-6 lg:grid-cols-[1.3fr_1fr]">
       <div>
-        <h3 className="mb-4 text-xl font-semibold text-mora-white">Choose Your Merchandise</h3>
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <h3 className="text-xl font-semibold text-mora-white">Choose Your Merchandise</h3>
+          <Button
+            variant="outline"
+            className="shrink-0 px-4 py-2 text-xs"
+            onClick={() => setSizeChartOpen(true)}
+          >
+            View Size Chart
+          </Button>
+        </div>
         {loading ? (
           <div className="flex justify-center py-10">
             <Spinner />
@@ -99,6 +110,8 @@ export function StepMerchSelection() {
           productName={sizeModal.name}
         />
       )}
+
+      <SizeChartModal isOpen={sizeChartOpen} onClose={() => setSizeChartOpen(false)} />
     </div>
   );
 }
