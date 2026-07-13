@@ -78,7 +78,7 @@ export function MerchandiseShowcase() {
 
         {!loading && products?.length === 0 && (
           <p className="text-center text-mora-white/60">
-            Merchandise is being finalized — check back soon!
+            Merchandise is being finalized. Check back soon!
           </p>
         )}
       </div>

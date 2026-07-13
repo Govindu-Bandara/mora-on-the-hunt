@@ -9,7 +9,7 @@ const POINTS = [
   {
     num: '02',
     title: 'One community, one hunt',
-    text: 'We want students, alumni, and supporters wearing the same colors — uniting everyone behind MORA on game day.',
+    text: 'We want students, alumni, and supporters wearing the same colors, uniting everyone behind MORA on game day.',
   },
   {
     num: '03',
