@@ -4,7 +4,7 @@ import { PRICES, NORMAL_PRICES } from '../../lib/pricingEngine';
 const CARDS = [
   { label: 'T-Shirt', pre: PRICES.shirt, normal: NORMAL_PRICES.shirt },
   { label: 'Silicone Bangle', pre: PRICES.bangle, flatPrice: true },
-  { label: 'Bundle', sub: '1 T-Shirt + 1 Bangle', pre: PRICES.bundle, normal: NORMAL_PRICES.bundle, highlight: true },
+  { label: 'Bundle', sub: '1 T-Shirt + 1 Bangle', pre: PRICES.bundle, normal: NORMAL_PRICES.bundle, highlight: true, bundle: true },
 ];
 
 export function PricingSection() {
@@ -45,25 +45,50 @@ export function PricingSection() {
                   {card.label}
                 </h3>
                 {card.sub && <p className="text-xs opacity-60">{card.sub}</p>}
-                <p className="mt-5 text-4xl font-black">Rs. {card.pre}</p>
-                {card.flatPrice ? (
-                  <p className="mt-4 text-sm font-medium text-mora-white/40">Fixed price</p>
+
+                {card.bundle ? (
+                  <>
+                    <div className="mt-5 space-y-2">
+                      <div className="flex items-baseline justify-between gap-4">
+                        <span className="text-xs font-bold uppercase tracking-widest text-mora-black/70">
+                          Pre-order
+                        </span>
+                        <span className="text-3xl font-black">Rs. {card.pre}</span>
+                      </div>
+                      <div className="flex items-baseline justify-between gap-4">
+                        <span className="text-xs font-bold uppercase tracking-widest text-mora-black/50">
+                          Regular
+                        </span>
+                        <span className="text-lg font-bold text-mora-black/50 line-through">
+                          Rs. {card.normal}
+                        </span>
+                      </div>
+                    </div>
+                    <p className="mt-5 text-sm font-bold uppercase tracking-wide text-mora-black">
+                      Save Rs. {savings} by pre-ordering
+                    </p>
+                  </>
                 ) : (
                   <>
-                    <p
-                      className={`mt-1 text-sm line-through ${
-                        card.highlight ? 'text-mora-black/50' : 'text-mora-white/40'
-                      }`}
-                    >
-                      Rs. {card.normal}
-                    </p>
-                    <p
-                      className={`mt-4 text-sm font-bold uppercase tracking-wide ${
-                        card.highlight ? 'text-mora-black' : 'text-green-400'
-                      }`}
-                    >
-                      Save Rs. {savings}
-                    </p>
+                    <p className="mt-5 text-4xl font-black">Rs. {card.pre}</p>
+                    {!card.flatPrice && (
+                      <>
+                        <p
+                          className={`mt-1 text-sm line-through ${
+                            card.highlight ? 'text-mora-black/50' : 'text-mora-white/40'
+                          }`}
+                        >
+                          Rs. {card.normal}
+                        </p>
+                        <p
+                          className={`mt-4 text-sm font-bold uppercase tracking-wide ${
+                            card.highlight ? 'text-mora-black' : 'text-green-400'
+                          }`}
+                        >
+                          Save Rs. {savings}
+                        </p>
+                      </>
+                    )}
                   </>
                 )}
               </motion.div>

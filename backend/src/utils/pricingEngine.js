@@ -1,18 +1,24 @@
 // KEEP IN SYNC WITH frontend/src/lib/pricingEngine.js — this logic must stay identical.
 
 // Bangles have no separate pre-order discount — Rs. 250 is their only price.
-// Bundle price is set so buying 1 shirt + 1 bangle as a bundle saves exactly
-// Rs. 50 vs buying them separately at pre-order prices (1700 + 250 - 50).
+// Bundle price is derived so buying 1 shirt + 1 bangle as a bundle saves exactly
+// BUNDLE_DISCOUNT vs buying them separately — computed for both the pre-order and
+// regular shirt prices so the two bundle figures can never drift out of sync.
+const BUNDLE_DISCOUNT = 50;
+const SHIRT_PRE = 1700;
+const SHIRT_REGULAR = 1850;
+const BANGLE = 250;
+
 const PRICES = Object.freeze({
-  shirt: 1700,
-  bangle: 250,
-  bundle: 1900,
+  shirt: SHIRT_PRE,
+  bangle: BANGLE,
+  bundle: SHIRT_PRE + BANGLE - BUNDLE_DISCOUNT, // 1900
 });
 
 const NORMAL_PRICES = Object.freeze({
-  shirt: 1850,
-  bangle: 250,
-  bundle: 2000,
+  shirt: SHIRT_REGULAR,
+  bangle: BANGLE,
+  bundle: SHIRT_REGULAR + BANGLE - BUNDLE_DISCOUNT, // 2050
 });
 
 function assertNonNegativeInteger(value, label) {
