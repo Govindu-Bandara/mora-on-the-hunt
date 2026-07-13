@@ -69,6 +69,31 @@ export function StepPaymentUpload() {
   return (
     <div className="space-y-6">
       <h3 className="text-xl font-semibold text-mora-white">Upload Payment Slip</h3>
+
+      <div className="rounded-lg border border-mora-gold/30 bg-mora-gold/5 p-4">
+        <p className="mb-2 text-sm font-semibold uppercase tracking-wide text-mora-gold">
+          Bank Account Details
+        </p>
+        <dl className="space-y-1 text-sm text-mora-white/80">
+          <div className="flex justify-between gap-4">
+            <dt className="text-mora-white/50">Account Number</dt>
+            <dd className="font-medium">0093705691</dd>
+          </div>
+          <div className="flex justify-between gap-4">
+            <dt className="text-mora-white/50">Bank</dt>
+            <dd className="font-medium">Bank of Ceylon</dd>
+          </div>
+          <div className="flex justify-between gap-4">
+            <dt className="text-mora-white/50">Branch</dt>
+            <dd className="font-medium">Katubedda Campus (631)</dd>
+          </div>
+          <div className="flex justify-between gap-4">
+            <dt className="text-mora-white/50">Account Holder</dt>
+            <dd className="font-medium">MR E T N RAJARATHNA</dd>
+          </div>
+        </dl>
+      </div>
+
       <p className="text-sm text-mora-white/60">
         Accepted formats: JPG, JPEG, PNG, PDF. Maximum size: 50MB.
       </p>
