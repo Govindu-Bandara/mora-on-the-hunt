@@ -14,7 +14,7 @@ export function Hero() {
         style={{ backgroundImage: "url('/Website%20Cover%20Image.png')" }}
       />
       {/* Dark overlay for text legibility */}
-      <div aria-hidden className="absolute inset-0 bg-mora-black/60" />
+      <div aria-hidden className="absolute inset-0 bg-mora-black/40" />
       {/* Texture + vignette */}
       <div className="mora-grain absolute inset-0" />
       <div
