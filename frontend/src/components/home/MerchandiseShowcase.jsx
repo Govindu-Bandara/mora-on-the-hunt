@@ -72,7 +72,7 @@ export function MerchandiseShowcase() {
         {!loading && (
           <>
             <ProductGroup title="T-Shirts" products={shirts} columns="sm:grid-cols-2 lg:grid-cols-3" />
-            <ProductGroup title="Silicone Bangles" products={bangles} columns="sm:grid-cols-2" />
+            <ProductGroup title="Silicone Bangles" products={bangles} columns="sm:grid-cols-2 lg:grid-cols-3" />
           </>
         )}
 
