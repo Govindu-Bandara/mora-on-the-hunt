@@ -3,7 +3,7 @@ import { PRICES, NORMAL_PRICES } from '../../lib/pricingEngine';
 
 const CARDS = [
   { label: 'T-Shirt', pre: PRICES.shirt, normal: NORMAL_PRICES.shirt },
-  { label: 'Silicone Bangle', pre: PRICES.bangle, normal: NORMAL_PRICES.bangle },
+  { label: 'Silicone Bangle', pre: PRICES.bangle, flatPrice: true },
   { label: 'Bundle', sub: '1 T-Shirt + 1 Bangle', pre: PRICES.bundle, normal: NORMAL_PRICES.bundle, highlight: true },
 ];
 
@@ -28,7 +28,7 @@ export function PricingSection() {
 
         <div className="mt-14 grid gap-8 sm:grid-cols-3">
           {CARDS.map((card, i) => {
-            const savings = card.normal - card.pre;
+            const savings = card.flatPrice ? 0 : card.normal - card.pre;
             return (
               <motion.div
                 key={card.label}
@@ -46,20 +46,26 @@ export function PricingSection() {
                 </h3>
                 {card.sub && <p className="text-xs opacity-60">{card.sub}</p>}
                 <p className="mt-5 text-4xl font-black">Rs. {card.pre}</p>
-                <p
-                  className={`mt-1 text-sm line-through ${
-                    card.highlight ? 'text-mora-black/50' : 'text-mora-white/40'
-                  }`}
-                >
-                  Rs. {card.normal}
-                </p>
-                <p
-                  className={`mt-4 text-sm font-bold uppercase tracking-wide ${
-                    card.highlight ? 'text-mora-black' : 'text-green-400'
-                  }`}
-                >
-                  Save Rs. {savings}
-                </p>
+                {card.flatPrice ? (
+                  <p className="mt-4 text-sm font-medium text-mora-white/40">Fixed price</p>
+                ) : (
+                  <>
+                    <p
+                      className={`mt-1 text-sm line-through ${
+                        card.highlight ? 'text-mora-black/50' : 'text-mora-white/40'
+                      }`}
+                    >
+                      Rs. {card.normal}
+                    </p>
+                    <p
+                      className={`mt-4 text-sm font-bold uppercase tracking-wide ${
+                        card.highlight ? 'text-mora-black' : 'text-green-400'
+                      }`}
+                    >
+                      Save Rs. {savings}
+                    </p>
+                  </>
+                )}
               </motion.div>
             );
           })}

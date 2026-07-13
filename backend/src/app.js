@@ -13,6 +13,12 @@ const adminRoutes = require('./routes/adminRoutes');
 
 const app = express();
 
+// Render (and most PaaS hosts) sit behind a reverse proxy — trust its
+// X-Forwarded-* headers so req.ip/req.protocol reflect the real client,
+// not the proxy. Needed for accurate rate limiting and for constructing
+// correct https:// URLs (e.g. product image links).
+app.set('trust proxy', 1);
+
 app.use(helmet());
 app.use(
   cors({

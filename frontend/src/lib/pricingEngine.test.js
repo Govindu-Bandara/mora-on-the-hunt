@@ -10,8 +10,8 @@ describe('pricingEngine.calculateTotal (frontend mirror)', () => {
     expect(calculateTotal(3, 2).finalTotal).toBe(5400);
   });
 
-  test('example 3: 1 shirt + 3 bangles = 2250', () => {
-    expect(calculateTotal(1, 3).finalTotal).toBe(2250);
+  test('example 3: 1 shirt + 3 bangles = 2350 (bangle has no pre-order discount)', () => {
+    expect(calculateTotal(1, 3).finalTotal).toBe(2350);
   });
 
   test('0 shirts and 0 bangles = 0', () => {

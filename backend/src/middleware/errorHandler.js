@@ -5,11 +5,14 @@ const env = require('../config/env');
 // eslint-disable-next-line no-unused-vars
 function errorHandler(err, req, res, next) {
   if (err instanceof multer.MulterError) {
+    const isImages = err.field === 'images';
     const message =
       err.code === 'LIMIT_UNEXPECTED_FILE'
-        ? 'Payment slip must be a JPG, PNG, or PDF file'
+        ? isImages
+          ? 'Images must be JPG, PNG, or WEBP files'
+          : 'Payment slip must be a JPG, PNG, or PDF file'
         : err.code === 'LIMIT_FILE_SIZE'
-        ? `Payment slip exceeds the maximum allowed size`
+        ? `${isImages ? 'Image' : 'Payment slip'} exceeds the maximum allowed size`
         : err.message;
     return res.status(400).json({ message });
   }

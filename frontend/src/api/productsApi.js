@@ -20,6 +20,15 @@ export async function updateProduct(id, payload) {
   return data.product;
 }
 
+export async function uploadProductImages(files) {
+  const formData = new FormData();
+  files.forEach((file) => formData.append('images', file));
+  const { data } = await axiosClient.post('/products/upload-images', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return data.images;
+}
+
 export async function reorderProductImages(id, images) {
   const { data } = await axiosClient.patch(`/products/${id}/images`, { images });
   return data.product;

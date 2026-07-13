@@ -16,9 +16,9 @@ function getClient() {
   return client;
 }
 
-async function uploadFile(buffer, originalName, mimetype) {
+async function uploadFile(buffer, originalName, mimetype, folder = 'payment-slips') {
   const ext = originalName.includes('.') ? originalName.slice(originalName.lastIndexOf('.')) : '';
-  const key = `payment-slips/${crypto.randomUUID()}${ext}`;
+  const key = `${folder}/${crypto.randomUUID()}${ext}`;
 
   await getClient().send(
     new PutObjectCommand({
