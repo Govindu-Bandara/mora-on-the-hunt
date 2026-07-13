@@ -47,27 +47,38 @@ export function PricingSection() {
                 {card.sub && <p className="text-xs opacity-60">{card.sub}</p>}
 
                 {card.bundle ? (
-                  <>
-                    <div className="mt-5 space-y-2">
-                      <div className="flex items-baseline justify-between gap-4">
-                        <span className="text-xs font-bold uppercase tracking-widest text-mora-black/70">
-                          Pre-order
-                        </span>
-                        <span className="text-3xl font-black">Rs. {card.pre}</span>
-                      </div>
-                      <div className="flex items-baseline justify-between gap-4">
-                        <span className="text-xs font-bold uppercase tracking-widest text-mora-black/50">
-                          Regular
-                        </span>
-                        <span className="text-lg font-bold text-mora-black/50 line-through">
-                          Rs. {card.normal}
-                        </span>
-                      </div>
-                    </div>
-                    <p className="mt-5 text-sm font-bold uppercase tracking-wide text-mora-black">
-                      Save Rs. {savings} by pre-ordering
-                    </p>
-                  </>
+                  (() => {
+                    // Anchor on the regular price of buying the two items separately
+                    // and itemize how the total saving splits between the two offers.
+                    const regularSeparate = NORMAL_PRICES.shirt + NORMAL_PRICES.bangle; // 2100
+                    const preOrder = PRICES.bundle; // 1900
+                    const totalSaving = regularSeparate - preOrder; // 200
+                    const preorderTeeSaving = NORMAL_PRICES.shirt - PRICES.shirt; // 150
+                    const bundleSaving = totalSaving - preorderTeeSaving; // 50
+                    return (
+                      <>
+                        <div className="mt-5 flex items-baseline gap-3">
+                          <span className="text-4xl font-black">Rs. {preOrder}</span>
+                          <span className="text-lg font-bold text-mora-black/50 line-through">
+                            Rs. {regularSeparate}
+                          </span>
+                        </div>
+                        <div className="mt-5 space-y-1.5 text-sm text-mora-black/80">
+                          <div className="flex justify-between gap-4">
+                            <span>Pre-order T-shirt offer</span>
+                            <span className="font-semibold">- Rs. {preorderTeeSaving}</span>
+                          </div>
+                          <div className="flex justify-between gap-4">
+                            <span>Bundle offer</span>
+                            <span className="font-semibold">- Rs. {bundleSaving}</span>
+                          </div>
+                        </div>
+                        <p className="mt-4 border-t border-mora-black/20 pt-4 text-base font-black uppercase tracking-wide text-mora-black">
+                          You save Rs. {totalSaving}
+                        </p>
+                      </>
+                    );
+                  })()
                 ) : (
                   <>
                     <p className="mt-5 text-4xl font-black">Rs. {card.pre}</p>
