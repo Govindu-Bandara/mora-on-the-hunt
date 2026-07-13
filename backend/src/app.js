@@ -19,7 +19,12 @@ const app = express();
 // correct https:// URLs (e.g. product image links).
 app.set('trust proxy', 1);
 
-app.use(helmet());
+// The frontend (Vercel) and backend (Render) are deliberately different
+// origins. Helmet's default Cross-Origin-Resource-Policy is "same-origin",
+// which blocks the frontend's <img> tags from loading product images
+// served from here. Product images are public by design, so allow
+// cross-origin embedding.
+app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 app.use(
   cors({
     origin: env.clientUrls,
