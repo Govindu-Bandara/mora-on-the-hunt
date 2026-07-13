@@ -5,6 +5,7 @@ import { useFetch } from '../hooks/useFetch';
 import { fetchProduct } from '../api/productsApi';
 import { useOrderFlow } from '../hooks/useOrderFlow';
 import { ProductDetailGallery } from '../components/home/ProductDetailGallery';
+import { SizeChartModal } from '../components/order/SizeChartModal';
 import { Button } from '../components/ui/Button';
 import { Spinner } from '../components/ui/Spinner';
 
@@ -15,6 +16,7 @@ export function ProductDetailPage() {
   const { dispatch } = useOrderFlow();
   const { data: product, loading, error } = useFetch(() => fetchProduct(id), [id]);
   const [size, setSize] = useState(null);
+  const [sizeChartOpen, setSizeChartOpen] = useState(false);
 
   function handleAdd() {
     if (product.category === 'tshirt' && !size) {
@@ -70,9 +72,18 @@ export function ProductDetailPage() {
 
           {product.category === 'tshirt' && (
             <div className="mt-8">
-              <p className="mb-3 text-xs font-bold uppercase tracking-widest text-mora-white/50">
-                Select Size
-              </p>
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <p className="text-xs font-bold uppercase tracking-widest text-mora-white/50">
+                  Select Size
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setSizeChartOpen(true)}
+                  className="text-xs font-bold uppercase tracking-widest text-mora-gold underline underline-offset-4 hover:text-mora-white"
+                >
+                  View Size Chart
+                </button>
+              </div>
               <div className="flex flex-wrap gap-2">
                 {SIZES.map((s) => (
                   <button
@@ -101,6 +112,8 @@ export function ProductDetailPage() {
           </Button>
         </div>
       </div>
+
+      <SizeChartModal isOpen={sizeChartOpen} onClose={() => setSizeChartOpen(false)} />
     </div>
   );
 }
