@@ -17,7 +17,7 @@ export function ProductDetailGallery({ images, alt }) {
   }, [images]);
 
   if (!images || images.length === 0) {
-    return <div className="aspect-square w-full bg-white/5" />;
+    return <div className="aspect-[2/3] w-full bg-white/5" />;
   }
 
   return (
@@ -39,7 +39,7 @@ export function ProductDetailGallery({ images, alt }) {
           ))}
         </div>
       )}
-      <div className="relative aspect-square flex-1 overflow-hidden bg-mora-navy">
+      <div className="relative aspect-[2/3] flex-1 overflow-hidden bg-mora-navy">
         <AnimatePresence mode="wait">
           <motion.img
             key={images[active]}
