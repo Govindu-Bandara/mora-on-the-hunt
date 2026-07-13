@@ -5,17 +5,16 @@ const AUTO_ADVANCE_MS = 3000;
 
 export function ProductDetailGallery({ images, alt }) {
   const [active, setActive] = useState(0);
-  const [paused, setPaused] = useState(false);
 
   useEffect(() => {
-    if (!images || images.length <= 1 || paused) return undefined;
+    if (!images || images.length <= 1) return undefined;
 
     const timer = setInterval(() => {
       setActive((prev) => (prev + 1) % images.length);
     }, AUTO_ADVANCE_MS);
 
     return () => clearInterval(timer);
-  }, [images, active, paused]);
+  }, [images]);
 
   if (!images || images.length === 0) {
     return <div className="aspect-square w-full bg-white/5" />;
@@ -40,11 +39,7 @@ export function ProductDetailGallery({ images, alt }) {
           ))}
         </div>
       )}
-      <div
-        className="relative aspect-square flex-1 overflow-hidden bg-mora-navy"
-        onMouseEnter={() => setPaused(true)}
-        onMouseLeave={() => setPaused(false)}
-      >
+      <div className="relative aspect-square flex-1 overflow-hidden bg-mora-navy">
         <AnimatePresence mode="wait">
           <motion.img
             key={images[active]}
