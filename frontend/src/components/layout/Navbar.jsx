@@ -40,7 +40,7 @@ export function Navbar() {
             alt="MORA Baseball"
             className="h-8 w-auto brightness-0 invert"
           />
-          <span className="text-sm font-black uppercase tracking-[0.25em] text-mora-gold">
+          <span className="hidden text-sm font-black uppercase tracking-[0.25em] text-mora-gold md:inline">
             MORA Baseball
           </span>
         </Link>
