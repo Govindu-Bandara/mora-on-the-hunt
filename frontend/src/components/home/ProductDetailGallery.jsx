@@ -1,7 +1,21 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+
+const AUTO_ADVANCE_MS = 3000;
 
 export function ProductDetailGallery({ images, alt }) {
   const [active, setActive] = useState(0);
+  const [paused, setPaused] = useState(false);
+
+  useEffect(() => {
+    if (!images || images.length <= 1 || paused) return undefined;
+
+    const timer = setInterval(() => {
+      setActive((prev) => (prev + 1) % images.length);
+    }, AUTO_ADVANCE_MS);
+
+    return () => clearInterval(timer);
+  }, [images, active, paused]);
 
   if (!images || images.length === 0) {
     return <div className="aspect-square w-full bg-white/5" />;
@@ -26,13 +40,23 @@ export function ProductDetailGallery({ images, alt }) {
           ))}
         </div>
       )}
-      <div className="aspect-square flex-1 overflow-hidden bg-mora-navy">
-        <img
-          src={images[active]}
-          alt={alt}
-          className="h-full w-full object-cover"
-          key={images[active]}
-        />
+      <div
+        className="relative aspect-square flex-1 overflow-hidden bg-mora-navy"
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
+      >
+        <AnimatePresence mode="wait">
+          <motion.img
+            key={images[active]}
+            src={images[active]}
+            alt={alt}
+            initial={{ opacity: 0, scale: 1.03 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.6, ease: 'easeInOut' }}
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+        </AnimatePresence>
       </div>
     </div>
   );
