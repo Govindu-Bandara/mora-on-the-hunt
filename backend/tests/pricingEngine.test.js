@@ -1,28 +1,28 @@
 const { calculateTotal } = require('../src/utils/pricingEngine');
 
 describe('pricingEngine.calculateTotal', () => {
-  test('example 1: 2 shirts + 1 bangle = 3550 (1 bundle + 1 shirt)', () => {
+  test('example 1: 2 shirts + 1 bangle = 3600 (1 bundle + 1 shirt)', () => {
     const result = calculateTotal(2, 1);
     expect(result.bundleCount).toBe(1);
     expect(result.remainingShirts).toBe(1);
     expect(result.remainingBangles).toBe(0);
-    expect(result.finalTotal).toBe(3550);
+    expect(result.finalTotal).toBe(3600);
   });
 
-  test('example 2: 3 shirts + 2 bangles = 5400 (2 bundles + 1 shirt)', () => {
+  test('example 2: 3 shirts + 2 bangles = 5500 (2 bundles + 1 shirt)', () => {
     const result = calculateTotal(3, 2);
     expect(result.bundleCount).toBe(2);
     expect(result.remainingShirts).toBe(1);
     expect(result.remainingBangles).toBe(0);
-    expect(result.finalTotal).toBe(5400);
+    expect(result.finalTotal).toBe(5500);
   });
 
-  test('example 3: 1 shirt + 3 bangles = 2350 (1 bundle + 2 bangles at Rs. 250 each)', () => {
+  test('example 3: 1 shirt + 3 bangles = 2400 (1 bundle + 2 bangles at Rs. 250 each)', () => {
     const result = calculateTotal(1, 3);
     expect(result.bundleCount).toBe(1);
     expect(result.remainingShirts).toBe(0);
     expect(result.remainingBangles).toBe(2);
-    expect(result.finalTotal).toBe(2350);
+    expect(result.finalTotal).toBe(2400);
   });
 
   test('0 shirts and 0 bangles = 0', () => {
@@ -42,12 +42,12 @@ describe('pricingEngine.calculateTotal', () => {
     expect(result.bundleCount).toBe(3);
     expect(result.remainingShirts).toBe(0);
     expect(result.remainingBangles).toBe(0);
-    expect(result.finalTotal).toBe(3 * 1850);
+    expect(result.finalTotal).toBe(3 * 1900);
   });
 
   test('large counts', () => {
     const result = calculateTotal(50, 50);
-    expect(result.finalTotal).toBe(50 * 1850);
+    expect(result.finalTotal).toBe(50 * 1900);
   });
 
   test('bundleSavings reflects discount vs buying separately', () => {

@@ -1,10 +1,12 @@
 // KEEP IN SYNC WITH frontend/src/lib/pricingEngine.js — this logic must stay identical.
 
 // Bangles have no separate pre-order discount — Rs. 250 is their only price.
+// Bundle price is set so buying 1 shirt + 1 bangle as a bundle saves exactly
+// Rs. 50 vs buying them separately at pre-order prices (1700 + 250 - 50).
 const PRICES = Object.freeze({
   shirt: 1700,
   bangle: 250,
-  bundle: 1850,
+  bundle: 1900,
 });
 
 const NORMAL_PRICES = Object.freeze({

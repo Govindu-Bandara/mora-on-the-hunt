@@ -79,10 +79,10 @@ describe('POST /api/orders', () => {
       .attach('paymentSlip', testFilePath);
 
     expect(res.status).toBe(201);
-    expect(res.body.finalTotal).toBe(3550);
+    expect(res.body.finalTotal).toBe(3600);
 
     const persisted = await Order.findOne({ orderId: res.body.orderId });
-    expect(persisted.finalTotal).toBe(3550);
+    expect(persisted.finalTotal).toBe(3600);
     expect(persisted.bundleCount).toBe(1);
     expect(persisted.items).toHaveLength(3);
   });
@@ -187,7 +187,7 @@ describe('PUT /api/orders/:orderId', () => {
 
     expect(updateRes.status).toBe(200);
     expect(updateRes.body.order.fullName).toBe('Edited Name');
-    expect(updateRes.body.order.finalTotal).toBe(1850); // 1 shirt + 1 bangle bundled
+    expect(updateRes.body.order.finalTotal).toBe(1900); // 1 shirt + 1 bangle bundled
     expect(updateRes.body.order.items).toHaveLength(2);
   });
 
