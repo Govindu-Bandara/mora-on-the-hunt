@@ -7,8 +7,14 @@ export function Hero() {
 
   return (
     <section className="relative flex min-h-[100svh] items-center overflow-hidden bg-mora-black">
-      {/* Diagonal navy block */}
-      <div className="mora-diagonal-bottom absolute inset-0 bg-gradient-to-br from-mora-navy via-mora-navy to-mora-black" />
+      {/* Cover background image */}
+      <div
+        aria-hidden
+        className="absolute inset-0 bg-cover bg-center"
+        style={{ backgroundImage: "url('/Website%20Cover%20Image.png')" }}
+      />
+      {/* Dark overlay for text legibility */}
+      <div aria-hidden className="absolute inset-0 bg-mora-black/60" />
       {/* Texture + vignette */}
       <div className="mora-grain absolute inset-0" />
       <div
