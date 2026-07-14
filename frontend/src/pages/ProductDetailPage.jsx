@@ -58,7 +58,7 @@ export function ProductDetailPage() {
       <div className="grid gap-12 lg:grid-cols-2">
         <ProductDetailGallery images={product.images} alt={product.name} />
 
-        <div>
+        <div className="min-w-0">
           <span className="mb-4 inline-block bg-mora-gold px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-mora-black">
             {product.category === 'tshirt' ? 'T-Shirt' : 'Bangle'}
           </span>
@@ -72,7 +72,7 @@ export function ProductDetailPage() {
 
           {product.category === 'tshirt' && (
             <div className="mt-8">
-              <div className="mb-3 flex items-center justify-between gap-3">
+              <div className="mb-3 flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
                 <p className="text-xs font-bold uppercase tracking-widest text-mora-white/50">
                   Select Size
                 </p>
