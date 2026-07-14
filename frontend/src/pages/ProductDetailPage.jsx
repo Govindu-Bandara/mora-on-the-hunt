@@ -10,6 +10,7 @@ import { Button } from '../components/ui/Button';
 import { Spinner } from '../components/ui/Spinner';
 
 const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+const FABRIC = 'Baby Pique';
 
 export function ProductDetailPage() {
   const { id } = useParams();
@@ -69,6 +70,15 @@ export function ProductDetailPage() {
           <p className="mt-6 max-w-md text-sm leading-relaxed text-mora-white/60">
             {product.description}
           </p>
+
+          {product.category === 'tshirt' && (
+            <p className="mt-4 text-xs font-bold uppercase tracking-widest text-mora-white/50">
+              Fabric
+              <span className="ml-2 font-normal normal-case tracking-normal text-mora-white/70">
+                {FABRIC}
+              </span>
+            </p>
+          )}
 
           {product.category === 'tshirt' && (
             <div className="mt-8">
