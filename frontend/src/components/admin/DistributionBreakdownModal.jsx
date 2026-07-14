@@ -20,6 +20,8 @@ function Cell({ value }) {
 export function DistributionBreakdownModal({ isOpen, onClose }) {
   const [tab, setTab] = useState('total');
   const [ndtOnly, setNdtOnly] = useState(false);
+  const [tshirtOnly, setTshirtOnly] = useState(false);
+  const [banglesOnly, setBanglesOnly] = useState(false);
   const { data, loading } = useFetch(
     () =>
       isOpen
@@ -67,15 +69,35 @@ export function DistributionBreakdownModal({ isOpen, onClose }) {
               </button>
             ))}
           </div>
-          <label className="flex items-center gap-2 text-sm text-mora-white/70">
-            <input
-              type="checkbox"
-              checked={ndtOnly}
-              onChange={(e) => setNdtOnly(e.target.checked)}
-              className="h-4 w-4 accent-mora-gold"
-            />
-            NDT only
-          </label>
+          <div className="flex flex-wrap items-center gap-4">
+            <label className="flex items-center gap-2 text-sm text-mora-white/70">
+              <input
+                type="checkbox"
+                checked={tshirtOnly}
+                onChange={(e) => setTshirtOnly(e.target.checked)}
+                className="h-4 w-4 accent-mora-gold"
+              />
+              T-shirt only
+            </label>
+            <label className="flex items-center gap-2 text-sm text-mora-white/70">
+              <input
+                type="checkbox"
+                checked={banglesOnly}
+                onChange={(e) => setBanglesOnly(e.target.checked)}
+                className="h-4 w-4 accent-mora-gold"
+              />
+              Bangles only
+            </label>
+            <label className="flex items-center gap-2 text-sm text-mora-white/70">
+              <input
+                type="checkbox"
+                checked={ndtOnly}
+                onChange={(e) => setNdtOnly(e.target.checked)}
+                className="h-4 w-4 accent-mora-gold"
+              />
+              NDT only
+            </label>
+          </div>
         </div>
 
         {loading || !data ? (
@@ -84,6 +106,15 @@ export function DistributionBreakdownModal({ isOpen, onClose }) {
           </div>
         ) : (
           <div className="overflow-x-auto rounded-xl border border-white/10">
+            {(() => {
+              const activeCategories = [
+                tshirtOnly && 'tshirt',
+                banglesOnly && 'bangle',
+              ].filter(Boolean);
+              const rows = activeCategories.length
+                ? data.rows.filter((r) => activeCategories.includes(r.category))
+                : data.rows;
+              return (
             <table className="w-full text-left text-sm">
               <thead className="bg-white/5 text-mora-white/50">
                 <tr>
@@ -97,7 +128,7 @@ export function DistributionBreakdownModal({ isOpen, onClose }) {
                 </tr>
               </thead>
               <tbody>
-                {data.rows.map((row) => (
+                {rows.map((row) => (
                   <tr key={row.name} className="border-t border-white/5 text-mora-white/80">
                     <td className="px-4 py-2 font-medium">{row.name}</td>
                     {data.sizes.map((size) => (
@@ -109,7 +140,7 @@ export function DistributionBreakdownModal({ isOpen, onClose }) {
                     <Cell value={row.total[tab]} />
                   </tr>
                 ))}
-                {data.rows.length === 0 && (
+                {rows.length === 0 && (
                   <tr>
                     <td colSpan={data.sizes.length + 2} className="px-4 py-8 text-center text-mora-white/50">
                       No orders yet.
@@ -117,12 +148,12 @@ export function DistributionBreakdownModal({ isOpen, onClose }) {
                   </tr>
                 )}
               </tbody>
-              {data.rows.length > 0 && (
+              {rows.length > 0 && (
                 <tfoot>
                   <tr className="border-t-2 border-white/10 bg-white/5 text-mora-white">
                     <td className="px-4 py-2.5 font-bold">Total</td>
                     {data.sizes.map((size) => {
-                      const sizeTotal = data.rows.reduce(
+                      const sizeTotal = rows.reduce(
                         (sum, row) =>
                           sum + (row.category === 'tshirt' ? row.bySize[size]?.[tab] || 0 : 0),
                         0
@@ -134,12 +165,14 @@ export function DistributionBreakdownModal({ isOpen, onClose }) {
                       );
                     })}
                     <td className="px-3 py-2.5 text-center font-bold text-mora-gold">
-                      {data.rows.reduce((sum, row) => sum + (row.total[tab] || 0), 0)}
+                      {rows.reduce((sum, row) => sum + (row.total[tab] || 0), 0)}
                     </td>
                   </tr>
                 </tfoot>
               )}
             </table>
+              );
+            })()}
           </div>
         )}
 
