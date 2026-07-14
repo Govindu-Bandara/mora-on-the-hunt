@@ -55,7 +55,7 @@ export function ProductDetailPage() {
         &larr; Back to Merchandise
       </Link>
 
-      <div className="grid gap-12 lg:grid-cols-2">
+      <div className="grid min-w-0 grid-cols-1 gap-12 lg:grid-cols-2">
         <ProductDetailGallery images={product.images} alt={product.name} />
 
         <div className="min-w-0">

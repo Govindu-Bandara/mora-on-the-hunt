@@ -21,9 +21,9 @@ export function ProductDetailGallery({ images, alt }) {
   }
 
   return (
-    <div className="flex flex-col-reverse gap-4 sm:flex-row">
+    <div className="flex min-w-0 flex-col-reverse gap-4 sm:flex-row">
       {images.length > 1 && (
-        <div className="flex gap-3 overflow-x-auto sm:flex-col sm:overflow-visible">
+        <div className="flex min-w-0 gap-3 overflow-x-auto sm:flex-col sm:overflow-visible">
           {images.map((src, i) => (
             <button
               key={src}
@@ -39,7 +39,7 @@ export function ProductDetailGallery({ images, alt }) {
           ))}
         </div>
       )}
-      <div className="relative aspect-[2/3] flex-1 overflow-hidden bg-mora-navy">
+      <div className="relative aspect-[2/3] w-full min-w-0 flex-1 overflow-hidden bg-mora-navy">
         <AnimatePresence mode="wait">
           <motion.img
             key={images[active]}
