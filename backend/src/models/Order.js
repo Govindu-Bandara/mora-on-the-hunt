@@ -8,6 +8,7 @@ const FACULTY_OPTIONS = [
   'Faculty of Medicine',
   'Faculty of Architecture',
   'Faculty of Business',
+  'BIT',
   'NDT',
 ];
 
@@ -40,7 +41,7 @@ const orderSchema = new mongoose.Schema(
     indexOrNic: { type: String, required: true, trim: true },
     telephone: { type: String, required: true, trim: true },
     batch: { type: String, required: true, trim: true },
-    faculty: { type: String, required: true, trim: true, enum: FACULTY_OPTIONS },
+    faculty: { type: String, required: true, trim: true },
     department: { type: String, required: true, trim: true },
     items: { type: [orderItemSchema], required: true, validate: (v) => v.length > 0 },
     bundleCount: { type: Number, required: true, min: 0 },
@@ -49,6 +50,7 @@ const orderSchema = new mongoose.Schema(
     discount: { type: Number, required: true, min: 0 },
     finalTotal: { type: Number, required: true, min: 0 },
     paymentReference: { type: String, required: true, trim: true },
+    comment: { type: String, default: '', trim: true, maxlength: 1000 },
     paymentSlip: {
       key: { type: String, required: true },
       originalName: { type: String, required: true },

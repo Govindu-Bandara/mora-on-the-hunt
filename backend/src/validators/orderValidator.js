@@ -1,8 +1,7 @@
 const { body } = require('express-validator');
-const { SIZES, FACULTY_OPTIONS } = require('../models/Order');
+const { SIZES } = require('../models/Order');
 
 const VALID_SIZES = SIZES || ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
-const VALID_FACULTIES = FACULTY_OPTIONS || [];
 
 const itemsValidator = body('items')
   .custom((value) => {
@@ -40,7 +39,7 @@ const customerFieldValidators = [
     .matches(/^[0-9+()\-\s]{7,15}$/)
     .withMessage('Telephone number is invalid'),
   body('batch').trim().notEmpty().withMessage('Batch is required').escape(),
-  body('faculty').trim().isIn(VALID_FACULTIES).withMessage('Please select a valid faculty'),
+  body('faculty').trim().notEmpty().withMessage('Faculty is required').escape(),
   body('department').trim().notEmpty().withMessage('Department is required').escape(),
 ];
 
@@ -51,6 +50,11 @@ const createOrderValidator = [
     .notEmpty()
     .withMessage('Payment reference number is required')
     .escape(),
+  body('comment')
+    .optional({ checkFalsy: true })
+    .trim()
+    .isLength({ max: 1000 })
+    .withMessage('Comment is too long'),
   itemsValidator,
 ];
 

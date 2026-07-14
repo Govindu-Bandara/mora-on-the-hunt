@@ -55,6 +55,7 @@ export function StepPaymentUpload() {
         )
       );
       formData.append('paymentSlip', state.paymentFile);
+      formData.append('comment', state.comment.trim());
 
       const result = await submitOrder(formData);
       dispatch({ type: 'SET_LAST_ORDER', order: result });
@@ -135,6 +136,21 @@ export function StepPaymentUpload() {
           <span className="text-sm text-mora-white/50">Click to select your payment slip</span>
         </label>
       )}
+
+      <div>
+        <label htmlFor="orderComment" className="mb-1 block text-sm text-mora-white/70">
+          Comment <span className="text-mora-white/40">(optional)</span>
+        </label>
+        <textarea
+          id="orderComment"
+          rows={3}
+          maxLength={1000}
+          value={state.comment}
+          onChange={(e) => dispatch({ type: 'SET_COMMENT', value: e.target.value })}
+          placeholder="Any note you'd like to add to your order"
+          className="w-full resize-y rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-mora-white placeholder-white/30 focus:border-mora-gold focus:outline-none"
+        />
+      </div>
 
       <div className="flex gap-3">
         <Button

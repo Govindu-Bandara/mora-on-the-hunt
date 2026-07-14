@@ -1,7 +1,7 @@
 import { Controller, useForm } from 'react-hook-form';
 import { Button } from '../../ui/Button';
-import { Select } from '../../ui/Select';
 import { BatchSelectField } from '../BatchSelectField';
+import { FacultySelectField } from '../FacultySelectField';
 import { useOrderFlow } from '../../../hooks/useOrderFlow';
 
 const NAME_PATTERN = /^[A-Za-z][A-Za-z .'-]*$/; // letters, spaces, . ' -
@@ -38,16 +38,6 @@ function sanitizePhone(value) {
   const digits = value.replace(/[^\d+]/g, '').replace(/\+/g, '');
   return value.trimStart().startsWith('+') ? `+${digits}` : digits;
 }
-
-const FACULTY_VALUES = [
-  'Faculty of Engineering',
-  'Faculty of IT',
-  'Faculty of Medicine',
-  'Faculty of Architecture',
-  'Faculty of Business',
-  'NDT',
-];
-const FACULTY_OPTIONS = FACULTY_VALUES.map((f) => ({ value: f, label: f }));
 
 export function StepCustomerInfo() {
   const {
@@ -119,7 +109,7 @@ export function StepCustomerInfo() {
           control={control}
           rules={{ required: 'Faculty is required' }}
           render={({ field }) => (
-            <Select value={field.value} onChange={field.onChange} options={FACULTY_OPTIONS} />
+            <FacultySelectField value={field.value} onChange={field.onChange} />
           )}
         />
         {errors.faculty && <p className="mt-1 text-xs text-red-400">{errors.faculty.message}</p>}

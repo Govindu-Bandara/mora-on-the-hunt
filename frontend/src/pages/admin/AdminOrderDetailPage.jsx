@@ -16,9 +16,9 @@ import { fetchProducts } from '../../api/productsApi';
 import { Button } from '../../components/ui/Button';
 import { Spinner } from '../../components/ui/Spinner';
 import { Modal } from '../../components/ui/Modal';
-import { Select } from '../../components/ui/Select';
 import { SizeSelectorModal } from '../../components/order/SizeSelectorModal';
 import { BatchSelectField } from '../../components/order/BatchSelectField';
+import { FacultySelectField } from '../../components/order/FacultySelectField';
 import { useAuth } from '../../hooks/useAuth';
 
 const STATUSES = ['Pending Verification', 'Verified', 'Completed', 'Cancelled'];
@@ -28,15 +28,6 @@ const CUSTOMER_FIELDS_BEFORE_FACULTY = [
   { name: 'telephone', label: 'Telephone' },
 ];
 const CUSTOMER_FIELDS_AFTER_FACULTY = [{ name: 'department', label: 'Department' }];
-const FACULTY_VALUES = [
-  'Faculty of Engineering',
-  'Faculty of IT',
-  'Faculty of Medicine',
-  'Faculty of Architecture',
-  'Faculty of Business',
-  'NDT',
-];
-const FACULTY_OPTIONS = FACULTY_VALUES.map((f) => ({ value: f, label: f }));
 
 function orderToEditState(order) {
   return {
@@ -307,10 +298,9 @@ export function AdminOrderDetailPage() {
             </div>
             <div>
               <label className="mb-1 block text-xs text-mora-white/50">Faculty</label>
-              <Select
+              <FacultySelectField
                 value={editState.customer.faculty}
                 onChange={(v) => updateCustomerField('faculty', v)}
-                options={FACULTY_OPTIONS}
               />
             </div>
             {CUSTOMER_FIELDS_AFTER_FACULTY.map((field) => (
@@ -458,6 +448,17 @@ export function AdminOrderDetailPage() {
           <a href={slipUrl} download={order.paymentSlip.originalName} className="mt-3 block text-sm text-mora-gold underline">
             Download
           </a>
+        )}
+      </div>
+
+      <div className="rounded-xl border border-white/10 bg-white/5 p-5">
+        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-mora-white/60">
+          Customer Comment
+        </h2>
+        {order.comment ? (
+          <p className="whitespace-pre-wrap text-sm text-mora-white/80">{order.comment}</p>
+        ) : (
+          <p className="text-sm text-mora-white/40">No comment provided</p>
         )}
       </div>
 
