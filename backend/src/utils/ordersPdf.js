@@ -42,16 +42,17 @@ function summarizeItems(items = []) {
 }
 
 const COLUMNS = [
-  { key: 'id', label: 'Order ID', x: 40, w: 66 },
-  { key: 'name', label: 'Name', x: 106, w: 118 },
-  { key: 'phone', label: 'Telephone', x: 224, w: 72 },
-  { key: 'batch', label: 'Batch', x: 296, w: 38 },
-  { key: 'faculty', label: 'Faculty', x: 334, w: 64 },
-  { key: 'items', label: 'Items', x: 398, w: 205 },
-  { key: 'total', label: 'Total', x: 603, w: 52 },
-  { key: 'dist', label: 'Dist.', x: 655, w: 32 },
-  { key: 'flag', label: 'Flag', x: 687, w: 30 },
-  { key: 'date', label: 'Date', x: 717, w: 62 },
+  { key: 'id', label: 'Order ID', x: 40, w: 60 },
+  { key: 'name', label: 'Name', x: 100, w: 100 },
+  { key: 'idx', label: 'Index/NIC', x: 200, w: 74 },
+  { key: 'phone', label: 'Telephone', x: 274, w: 68 },
+  { key: 'batch', label: 'Batch', x: 342, w: 34 },
+  { key: 'faculty', label: 'Faculty', x: 376, w: 60 },
+  { key: 'items', label: 'Items', x: 436, w: 175 },
+  { key: 'total', label: 'Total', x: 611, w: 50 },
+  { key: 'dist', label: 'Dist.', x: 661, w: 30 },
+  { key: 'flag', label: 'Flag', x: 691, w: 28 },
+  { key: 'date', label: 'Date', x: 719, w: 60 },
 ];
 
 const CELL_PAD = 3;
@@ -77,6 +78,7 @@ function orderToCells(order) {
   return {
     id: order.orderId || '',
     name: order.fullName || '',
+    idx: order.indexOrNic || '',
     phone: order.telephone || '',
     batch: order.batch || '',
     faculty: abbreviateFaculty(order.faculty),
