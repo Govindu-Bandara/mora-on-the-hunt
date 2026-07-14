@@ -4,12 +4,40 @@ import { Select } from '../../ui/Select';
 import { BatchSelectField } from '../BatchSelectField';
 import { useOrderFlow } from '../../../hooks/useOrderFlow';
 
+const NAME_PATTERN = /^[A-Za-z][A-Za-z .'-]*$/; // letters, spaces, . ' -
+const PHONE_PATTERN = /^\+?[0-9]{7,15}$/; // optional leading +, 7-15 digits
+
+const nameRules = (label) => ({
+  required: `${label} is required`,
+  pattern: { value: NAME_PATTERN, message: `${label} can only contain letters` },
+});
+
 const FIELDS_BEFORE_FACULTY = [
-  { name: 'fullName', label: 'Full Name' },
+  { name: 'fullName', label: 'Full Name', rules: nameRules('Full Name') },
   { name: 'indexOrNic', label: 'Index Number or NIC Number' },
-  { name: 'telephone', label: 'Telephone Number' },
+  {
+    name: 'telephone',
+    label: 'Telephone Number',
+    inputMode: 'tel',
+    sanitize: 'phone',
+    rules: {
+      required: 'Telephone Number is required',
+      pattern: {
+        value: PHONE_PATTERN,
+        message: 'Enter a valid phone number (digits and + only)',
+      },
+    },
+  },
 ];
-const FIELDS_AFTER_FACULTY = [{ name: 'department', label: 'Department' }];
+const FIELDS_AFTER_FACULTY = [
+  { name: 'department', label: 'Department', rules: nameRules('Department') },
+];
+
+// Strip anything that is not a digit or +, and keep + only as a leading character.
+function sanitizePhone(value) {
+  const digits = value.replace(/[^\d+]/g, '').replace(/\+/g, '');
+  return value.trimStart().startsWith('+') ? `+${digits}` : digits;
+}
 
 const FACULTY_VALUES = [
   'Faculty of Engineering',
@@ -40,6 +68,10 @@ export function StepCustomerInfo() {
   }
 
   function renderField(field) {
+    const registration = register(
+      field.name,
+      field.rules ?? { required: `${field.label} is required` }
+    );
     return (
       <div key={field.name}>
         <label htmlFor={field.name} className="mb-1 block text-sm text-mora-white/70">
@@ -47,7 +79,14 @@ export function StepCustomerInfo() {
         </label>
         <input
           id={field.name}
-          {...register(field.name, { required: `${field.label} is required` })}
+          inputMode={field.inputMode}
+          {...registration}
+          onChange={(e) => {
+            if (field.sanitize === 'phone') {
+              e.target.value = sanitizePhone(e.target.value);
+            }
+            registration.onChange(e);
+          }}
           className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-mora-white placeholder-white/30 focus:border-mora-gold focus:outline-none"
         />
         {errors[field.name] && (
