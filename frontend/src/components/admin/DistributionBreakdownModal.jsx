@@ -117,6 +117,28 @@ export function DistributionBreakdownModal({ isOpen, onClose }) {
                   </tr>
                 )}
               </tbody>
+              {data.rows.length > 0 && (
+                <tfoot>
+                  <tr className="border-t-2 border-white/10 bg-white/5 text-mora-white">
+                    <td className="px-4 py-2.5 font-bold">Total</td>
+                    {data.sizes.map((size) => {
+                      const sizeTotal = data.rows.reduce(
+                        (sum, row) =>
+                          sum + (row.category === 'tshirt' ? row.bySize[size]?.[tab] || 0 : 0),
+                        0
+                      );
+                      return (
+                        <td key={size} className="px-3 py-2.5 text-center font-bold">
+                          {sizeTotal || <span className="text-mora-white/20">&mdash;</span>}
+                        </td>
+                      );
+                    })}
+                    <td className="px-3 py-2.5 text-center font-bold text-mora-gold">
+                      {data.rows.reduce((sum, row) => sum + (row.total[tab] || 0), 0)}
+                    </td>
+                  </tr>
+                </tfoot>
+              )}
             </table>
           </div>
         )}
