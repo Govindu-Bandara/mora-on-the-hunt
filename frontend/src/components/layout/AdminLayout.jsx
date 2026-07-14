@@ -3,7 +3,8 @@ import { useAuth } from '../../hooks/useAuth';
 
 const NAV_ITEMS = [
   { to: '/admin/dashboard', label: 'Dashboard' },
-  { to: '/admin/orders', label: 'Orders' },
+  { to: '/admin/orders', label: 'Orders', end: true },
+  { to: '/admin/orders/new', label: 'Add Order' },
   { to: '/admin/products', label: 'Products' },
 ];
 
@@ -19,6 +20,7 @@ export function AdminLayout() {
             <NavLink
               key={item.to}
               to={item.to}
+              end={item.end}
               className={({ isActive }) =>
                 `rounded-lg px-3 py-2 text-sm transition-colors ${
                   isActive ? 'bg-mora-gold/15 text-mora-gold' : 'text-mora-white/70 hover:bg-white/5'

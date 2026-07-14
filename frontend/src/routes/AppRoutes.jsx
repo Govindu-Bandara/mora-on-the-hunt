@@ -8,6 +8,7 @@ import { AdminLoginPage } from '../pages/admin/AdminLoginPage';
 import { UnauthorizedPage } from '../pages/admin/UnauthorizedPage';
 import { AdminDashboardPage } from '../pages/admin/AdminDashboardPage';
 import { AdminOrdersPage } from '../pages/admin/AdminOrdersPage';
+import { AdminOrderCreatePage } from '../pages/admin/AdminOrderCreatePage';
 import { AdminOrderDetailPage } from '../pages/admin/AdminOrderDetailPage';
 import { AdminProductsPage } from '../pages/admin/AdminProductsPage';
 import { AdminProductEditPage } from '../pages/admin/AdminProductEditPage';
@@ -29,7 +30,8 @@ export function AppRoutes() {
         <Route element={<AdminLayout />}>
           <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
           <Route path="/admin/orders" element={<AdminOrdersPage />} />
-          <Route path="/admin/orders/:orderId" element={<AdminOrderDetailPage />} />
+          <Route path="/admin/orders/new" element={<AdminOrderCreatePage />} />
+            <Route path="/admin/orders/:orderId" element={<AdminOrderDetailPage />} />
           <Route path="/admin/products" element={<AdminProductsPage />} />
           <Route path="/admin/products/:id" element={<AdminProductEditPage />} />
           <Route element={<RoleRoute role="superadmin" />}>
