@@ -1,18 +1,37 @@
-import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Button } from '../ui/Button';
 import { useOrderFlow } from '../../hooks/useOrderFlow';
 
+const COVER_IMAGES = ['/Website%20Cover%20Image.png', '/Website%20Cover%20Image%202.png'];
+const COVER_ROTATE_MS = 8000;
+
 export function Hero() {
   const { dispatch } = useOrderFlow();
+  const [cover, setCover] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCover((prev) => (prev + 1) % COVER_IMAGES.length);
+    }, COVER_ROTATE_MS);
+    return () => clearInterval(timer);
+  }, []);
 
   return (
     <section className="relative flex min-h-[100svh] items-center overflow-hidden bg-mora-black">
-      {/* Cover background image */}
-      <div
-        aria-hidden
-        className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: "url('/Website%20Cover%20Image.png')" }}
-      />
+      {/* Cover background image (cross-fades between covers) */}
+      <AnimatePresence mode="sync">
+        <motion.div
+          key={COVER_IMAGES[cover]}
+          aria-hidden
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: `url('${COVER_IMAGES[cover]}')` }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 1.2, ease: 'easeInOut' }}
+        />
+      </AnimatePresence>
       {/* Dark overlay for text legibility */}
       <div aria-hidden className="absolute inset-0 bg-mora-black/40" />
       {/* Texture + vignette */}
