@@ -19,8 +19,8 @@ export function Hero() {
 
   return (
     <section className="relative flex min-h-[100svh] items-center overflow-hidden bg-mora-black">
-      {/* Cover background image (cross-fades between covers) */}
-      <AnimatePresence mode="sync">
+      {/* Cover background image (fades out, then the next fades in) */}
+      <AnimatePresence mode="wait">
         <motion.div
           key={COVER_IMAGES[cover]}
           aria-hidden
@@ -29,7 +29,7 @@ export function Hero() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 1.2, ease: 'easeInOut' }}
+          transition={{ duration: 0.8, ease: 'easeInOut' }}
         />
       </AnimatePresence>
       {/* Dark overlay for text legibility */}
