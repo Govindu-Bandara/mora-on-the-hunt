@@ -5,16 +5,17 @@ const AUTO_ADVANCE_MS = 3000;
 
 export function ProductDetailGallery({ images, alt }) {
   const [active, setActive] = useState(0);
+  const [paused, setPaused] = useState(false);
 
   useEffect(() => {
-    if (!images || images.length <= 1) return undefined;
+    if (!images || images.length <= 1 || paused) return undefined;
 
     const timer = setInterval(() => {
       setActive((prev) => (prev + 1) % images.length);
     }, AUTO_ADVANCE_MS);
 
     return () => clearInterval(timer);
-  }, [images]);
+  }, [images, paused]);
 
   if (!images || images.length === 0) {
     return <div className="aspect-[2/3] w-full bg-white/5" />;
@@ -23,12 +24,19 @@ export function ProductDetailGallery({ images, alt }) {
   return (
     <div className="flex min-w-0 flex-col-reverse gap-4 sm:flex-row">
       {images.length > 1 && (
-        <div className="flex min-w-0 gap-3 overflow-x-auto sm:flex-col sm:overflow-visible">
+        <div
+          className="flex min-w-0 gap-3 overflow-x-auto sm:flex-col sm:overflow-visible"
+          onMouseLeave={() => setPaused(false)}
+        >
           {images.map((src, i) => (
             <button
               key={src}
               type="button"
               onClick={() => setActive(i)}
+              onMouseEnter={() => {
+                setActive(i);
+                setPaused(true);
+              }}
               aria-label={`View image ${i + 1}`}
               className={`h-16 w-16 shrink-0 overflow-hidden border-2 transition-colors sm:h-20 sm:w-20 ${
                 active === i ? 'border-mora-gold' : 'border-white/10 hover:border-white/30'
